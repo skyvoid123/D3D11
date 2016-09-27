@@ -33,6 +33,9 @@
     <ClInclude Include="Common\MathHelper.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Common\GeometryGenerator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\GameTimer.cpp">
@@ -41,13 +44,16 @@
     <ClCompile Include="Common\d3dApp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Chapter4_Direct3DInitialization\Init Direct3D.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Chapter5_Drawing\BoxDrawing.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Common\MathHelper.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter5_Drawing\HillsDrawing.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\GeometryGenerator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
