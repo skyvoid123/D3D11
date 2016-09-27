@@ -114,11 +114,11 @@ void GeometryGenerator::CreateGrid(float width, float depth, UINT m, UINT n, Mes
 		{
 			meshData.Indices[current_index] = z * n + x;
 			meshData.Indices[current_index + 1] = z * n + x + 1;
-			meshData.Indices[current_index + 2] = z * (n + 1) + x;
+			meshData.Indices[current_index + 2] = (z + 1) * n+ x;
 
-			meshData.Indices[current_index + 3] = z * n + x;
-			meshData.Indices[current_index + 4] = z * (n + 1) + x;
-			meshData.Indices[current_index + 4] = z * (n + 1) + x + 1;
+			meshData.Indices[current_index + 3] = (z + 1) * n + x;
+			meshData.Indices[current_index + 4] = z * n + x + 1;
+			meshData.Indices[current_index + 5] = (z + 1) * n + x + 1;
 
 			current_index += 6;
 		}

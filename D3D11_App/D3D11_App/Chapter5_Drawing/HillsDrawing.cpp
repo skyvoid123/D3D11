@@ -104,7 +104,7 @@ void HillsApp::BuildGeometryBuffers()
 	GeometryGenerator::MeshData grid;
 	GeometryGenerator geometry_generator;
 
-	geometry_generator.CreateGrid(160.0f, 160.0f, 50, 50, grid);
+	geometry_generator.CreateGrid(150.0f, 150.0f, 500, 500, grid);
 
 	grid_index_count_ = grid.Indices.size();
 
@@ -175,7 +175,7 @@ void HillsApp::BuildGeometryBuffers()
 
 void HillsApp::BuildFX()
 {
-	std::ifstream fin("fx/hills.fxo", std::ios::binary);
+	std::ifstream fin("fx/color.fxo", std::ios::binary);
 
 	fin.seekg(0, std::ios_base::end);
 	int size = (int)fin.tellg();
@@ -283,11 +283,11 @@ void HillsApp::OnMouseMove(WPARAM btn_state, int x, int y)
 	{
 		// Make each pixel correspond to a quarter of a degree.
 		float dx = XMConvertToRadians(0.25f * (float)(x - last_mouse_pos_.x));
-		float dy = XMConvertToRadians(0.25f * (float)(x - last_mouse_pos_.y));
+		float dy = XMConvertToRadians(0.25f * (float)(y - last_mouse_pos_.y));
 
 		// Update angles based on input to orbit camera around box.
-		theta_ += dx;
-		phi_ += dy;
+		theta_ -= dx;
+		phi_ -= dy;
 
 		// Restrict the angle mPhi.
 		phi_ = MathHelper::Clamp(phi_, 0.1f, MathHelper::Pi - 0.1f);

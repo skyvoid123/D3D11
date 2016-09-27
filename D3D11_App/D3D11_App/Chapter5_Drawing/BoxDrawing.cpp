@@ -2,6 +2,8 @@
 #include "d3dx11effect.h"
 #include "MathHelper.h"
 
+using namespace DirectX;
+
 struct Vertex
 {
 	XMFLOAT3 Pos;
@@ -98,14 +100,14 @@ void BoxApp::BuildGeometryBuffers()
 	// Create vertex buffer
 	Vertex vertices[] =
 	{
-		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), (const float*)&Colors::White },
-		{ XMFLOAT3(-1.0f, +1.0f, -1.0f), (const float*)&Colors::Black },
-		{ XMFLOAT3(+1.0f, +1.0f, -1.0f), (const float*)&Colors::Red },
-		{ XMFLOAT3(+1.0f, -1.0f, -1.0f), (const float*)&Colors::Green },
-		{ XMFLOAT3(-1.0f, -1.0f, +1.0f), (const float*)&Colors::Blue },
-		{ XMFLOAT3(-1.0f, +1.0f, +1.0f), (const float*)&Colors::Yellow },
-		{ XMFLOAT3(+1.0f, +1.0f, +1.0f), (const float*)&Colors::Cyan },
-		{ XMFLOAT3(+1.0f, -1.0f, +1.0f), (const float*)&Colors::Magenta }
+		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White) },
+		{ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black) },
+		{ XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red) },
+		{ XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::Green) },
+		{ XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Blue) },
+		{ XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow) },
+		{ XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Cyan) },
+		{ XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta) }
 	};
 
 	D3D11_BUFFER_DESC vbd;
@@ -167,29 +169,19 @@ void BoxApp::BuildFX()
 	shaderFlags |= D3D10_SHADER_SKIP_OPTIMIZATION;
 #endif
 
-	ID3D10Blob* compiledShader = nullptr;
-	ID3D10Blob* compilationMsgs = nullptr;
-	HRESULT hr = D3DX11CompileFromFile(L"FX/color.fx", nullptr, nullptr, 0, "fx_5_0",
-		shaderFlags, 0, 0, &compiledShader, &compilationMsgs, nullptr);
+	std::ifstream fin("fx/color.fxo", std::ios::binary);
 
-	// compilationMsgs can store errors or warnings.
-	if (compilationMsgs != nullptr)
-	{
-		MessageBoxA(nullptr, (char*)compilationMsgs->GetBufferPointer(), nullptr, 0);
-		ReleaseCOM(compilationMsgs);
-	}
+	fin.seekg(0, std::ios_base::end);
+	int size = (int)fin.tellg();
+	fin.seekg(0, std::ios_base::beg);
 
-	// Even if there are no compilationMsgs, check to make sure there were no other errors.
-	if (FAILED(hr))
-	{
-		return;
-	}
+	std::vector<char> compiled_shader(size);
 
-	HR(D3DX11CreateEffectFromMemory(compiledShader->GetBufferPointer(), compiledShader->GetBufferSize(),
+	fin.read(&compiled_shader[0], size);
+	fin.close();
+
+	HR(D3DX11CreateEffectFromMemory(&compiled_shader[0], size,
 		0, d3d_device_, &fx_));
-
-	// Done with compiled shader.
-	ReleaseCOM(compiledShader);
 
 	technique_ = fx_->GetTechniqueByName("ColorTech");
 	fx_world_view_proj_ = fx_->GetVariableByName("gWorldViewProj")->AsMatrix();
@@ -245,7 +237,7 @@ void BoxApp::DrawScene()
 
 	UINT stride = sizeof(Vertex);
 	UINT offet = 0;
-	d3d_context_->IASetVertexBuffers(0, 1, &box_vertex_buffer_, &stride, 0);
+	d3d_context_->IASetVertexBuffers(0, 1, &box_vertex_buffer_, &stride, &offet);
 	d3d_context_->IASetIndexBuffer(box_index_buffer_, DXGI_FORMAT_R32_UINT, 0);
 
 	// Set constants
@@ -291,8 +283,8 @@ void BoxApp::OnMouseMove(WPARAM btn_state, int x, int y)
 		float dy = XMConvertToRadians(0.25f * (float)(y - last_mouse_pos_.y));
 
 		// Update angles based on input to orbit camera around box.
-		theta_ += dx;
-		phi_ += dy;
+		theta_ -= dx;
+		phi_ -= dy;
 
 		// Restrict the angle mPhi.
 		phi_ = MathHelper::Clamp(phi_, 0.1f, MathHelper::Pi - 0.1f);

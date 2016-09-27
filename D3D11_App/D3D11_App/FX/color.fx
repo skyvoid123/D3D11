@@ -11,7 +11,7 @@ struct VertexIn
 
 struct VertexOut
 {
-	float3 PosH  : SV_POSITION;
+	float4 PosH  : SV_POSITION;
 	float4 Color : COLOR;
 };
 
@@ -38,7 +38,7 @@ technique11 ColorTech
 	pass P0
 	{
 		SetVertexShader(CompileShader(vs_5_0, VS()));
-		setGeometryShader(NULL);
+		SetGeometryShader(NULL);
 		SetPixelShader(CompileShader(ps_5_0, PS()));
 	}
 }
