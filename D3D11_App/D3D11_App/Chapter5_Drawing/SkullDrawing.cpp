@@ -9,11 +9,11 @@ struct Vertex
 	XMFLOAT4 Color;
 };
 
-class HillsApp : public D3DApp
+class SkullApp : public D3DApp
 {
 public:
-	HillsApp(HINSTANCE hInstance);
-	~HillsApp();
+	SkullApp(HINSTANCE hInstance);
+	~SkullApp();
 
 	virtual bool Init() override;
 	virtual void OnResize() override;
@@ -55,7 +55,7 @@ private:
 	POINT last_mouse_pos_;
 };
 
-HillsApp::HillsApp(HINSTANCE hInstance)
+SkullApp::SkullApp(HINSTANCE hInstance)
 	: D3DApp(hInstance)
 	, vertex_buffer_(nullptr)
 	, index_buffer_(nullptr)
@@ -82,7 +82,7 @@ HillsApp::HillsApp(HINSTANCE hInstance)
 	XMStoreFloat4x4(&world_, T);
 }
 
-HillsApp::~HillsApp()
+SkullApp::~SkullApp()
 {
 	ReleaseCOM(vertex_buffer_);
 	ReleaseCOM(index_buffer_);
@@ -91,7 +91,7 @@ HillsApp::~HillsApp()
 	ReleaseCOM(wireframe_RS_);
 }
 
-bool HillsApp::Init()
+bool SkullApp::Init()
 {
 	if (!D3DApp::Init())
 	{
@@ -113,7 +113,7 @@ bool HillsApp::Init()
 	return true;
 }
 
-void HillsApp::BuildGeometryBuffers()
+void SkullApp::BuildGeometryBuffers()
 {
 	std::ifstream fin("Models/skull.txt");
 	if (!fin)
@@ -182,7 +182,7 @@ void HillsApp::BuildGeometryBuffers()
 	HR(d3d_device_->CreateBuffer(&ibd, &iinitData, &index_buffer_));
 }
 
-void HillsApp::BuildFX()
+void SkullApp::BuildFX()
 {
 	std::ifstream fin("fx/color.fxo", std::ios::binary);
 
@@ -202,7 +202,7 @@ void HillsApp::BuildFX()
 	fx_WVP_ = fx_->GetVariableByName("gWorldViewProj")->AsMatrix();
 }
 
-void HillsApp::BuildVertexLayout()
+void SkullApp::BuildVertexLayout()
 {
 	// Create the vertex input layout.
 	D3D11_INPUT_ELEMENT_DESC vertex_desc[] = {
@@ -217,7 +217,7 @@ void HillsApp::BuildVertexLayout()
 		pass_desc.IAInputSignatureSize, &input_layout_));
 }
 
-void HillsApp::OnResize()
+void SkullApp::OnResize()
 {
 	D3DApp::OnResize();
 
@@ -225,7 +225,7 @@ void HillsApp::OnResize()
 	XMStoreFloat4x4(&proj_, p);
 }
 
-void HillsApp::UpdateScene(float dt)
+void SkullApp::UpdateScene(float dt)
 {
 	// Convert Spherical to Cartesian coordinates.
 	float x = radius_*sinf(phi_)*cosf(theta_);
@@ -241,7 +241,7 @@ void HillsApp::UpdateScene(float dt)
 	XMStoreFloat4x4(&view_, v);
 }
 
-void HillsApp::DrawScene()
+void SkullApp::DrawScene()
 {
 	d3d_context_->ClearRenderTargetView(render_target_view_, (const float*)&Colors::LightSteelBlue);
 	d3d_context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -275,7 +275,7 @@ void HillsApp::DrawScene()
 	HR(swap_chain_->Present(0, 0));
 }
 
-void HillsApp::OnMouseDown(WPARAM btn_state, int x, int y)
+void SkullApp::OnMouseDown(WPARAM btn_state, int x, int y)
 {
 	last_mouse_pos_.x = x;
 	last_mouse_pos_.y = y;
@@ -283,12 +283,12 @@ void HillsApp::OnMouseDown(WPARAM btn_state, int x, int y)
 	SetCapture(main_wnd_);
 }
 
-void HillsApp::OnMouseUp(WPARAM btn_state, int x, int y)
+void SkullApp::OnMouseUp(WPARAM btn_state, int x, int y)
 {
 	ReleaseCapture();
 }
 
-void HillsApp::OnMouseMove(WPARAM btn_state, int x, int y)
+void SkullApp::OnMouseMove(WPARAM btn_state, int x, int y)
 {
 	if ((btn_state & MK_LBUTTON) != 0)
 	{
@@ -305,15 +305,15 @@ void HillsApp::OnMouseMove(WPARAM btn_state, int x, int y)
 	}
 	else if ((btn_state & MK_RBUTTON) != 0)
 	{
-		// Make each pixel correspond to 0.2 unit in the scene.
-		float dx = 0.2f * (float)(x - last_mouse_pos_.x);
-		float dy = 0.2f * (float)(y - last_mouse_pos_.y);
+		// Make each pixel correspond to 0.05 unit in the scene.
+		float dx = 0.05f * (float)(x - last_mouse_pos_.x);
+		float dy = 0.05f * (float)(y - last_mouse_pos_.y);
 
 		// Update the camera radius based on input.
 		radius_ += dx - dy;
 
 		// Restrict the radius.
-		radius_ = MathHelper::Clamp(radius_, 50.0f, 500.0f);
+		radius_ = MathHelper::Clamp(radius_, 5.0f, 50.0f);
 	}
 
 	last_mouse_pos_.x = x;
@@ -327,7 +327,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	HillsApp theApp(hInstance);
+	SkullApp theApp(hInstance);
 
 	if (!theApp.Init())
 	{

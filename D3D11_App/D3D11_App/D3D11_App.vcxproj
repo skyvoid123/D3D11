@@ -155,7 +155,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Chapter5_Drawing\ShapesDrawing.cpp" />
-    <ClCompile Include="Chapter5_Drawing\SkullDrawing.cpp" />
     <ClCompile Include="Common\d3dApp.cpp" />
     <ClCompile Include="Common\dxerr.cpp" />
     <ClCompile Include="Common\GameTimer.cpp" />

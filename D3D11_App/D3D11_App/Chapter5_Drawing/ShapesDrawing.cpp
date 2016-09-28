@@ -9,11 +9,11 @@ struct Vertex
 	XMFLOAT4 Color;
 };
 
-class HillsApp : public D3DApp
+class ShapesApp : public D3DApp
 {
 public:
-	HillsApp(HINSTANCE hInstance);
-	~HillsApp();
+	ShapesApp(HINSTANCE hInstance);
+	~ShapesApp();
 
 	virtual bool Init() override;
 	virtual void OnResize() override;
@@ -73,7 +73,7 @@ private:
 	POINT last_mouse_pos_;
 };
 
-HillsApp::HillsApp(HINSTANCE hInstance)
+ShapesApp::ShapesApp(HINSTANCE hInstance)
 	: D3DApp(hInstance)
 	, vertex_buffer_(nullptr)
 	, index_buffer_(nullptr)
@@ -102,10 +102,19 @@ HillsApp::HillsApp(HINSTANCE hInstance)
 
 	XMMATRIX center_sphere_scale = XMMatrixScaling(2.f, 2.f, 2.f);
 	XMMATRIX center_sphere_offset = XMMatrixTranslation(0.f, 2.f, 0.f);
-	XMStoreFloat4x4(&center_sphere_world_)
+	XMStoreFloat4x4(&center_sphere_world_, XMMatrixMultiply(center_sphere_scale, center_sphere_offset));
+
+	for (int i = 0; i < 5; ++i)
+	{
+		XMStoreFloat4x4(&cylinder_world_[i * 2], XMMatrixTranslation(-5.f, 1.5f, -10.f + i*5.f));
+		XMStoreFloat4x4(&cylinder_world_[i * 2 + 1], XMMatrixTranslation(5.f, 1.5f, -10.f + i*5.f));
+
+		XMStoreFloat4x4(&sphere_world_[i * 2], XMMatrixTranslation(-5.f, 3.5f, 10.f + i*5.f));
+		XMStoreFloat4x4(&sphere_world_[i * 2 + 1], XMMatrixTranslation(5.f, 3.5f, 10.f + i*5.f));
+	}
 }
 
-HillsApp::~HillsApp()
+ShapesApp::~ShapesApp()
 {
 	ReleaseCOM(vertex_buffer_);
 	ReleaseCOM(index_buffer_);
@@ -114,7 +123,7 @@ HillsApp::~HillsApp()
 	ReleaseCOM(wireframe_RS_);
 }
 
-bool HillsApp::Init()
+bool ShapesApp::Init()
 {
 	if (!D3DApp::Init())
 	{
@@ -136,65 +145,105 @@ bool HillsApp::Init()
 	return true;
 }
 
-void HillsApp::BuildGeometryBuffers()
+void ShapesApp::BuildGeometryBuffers()
 {
-	std::ifstream fin("Models/skull.txt");
-	if (!fin)
-	{
-		MessageBox(0, L"Models/skull.txt not found.", 0, 0);
-		return;
-	}
+	GeometryGenerator::MeshData box;
+	GeometryGenerator::MeshData grid;
+	GeometryGenerator::MeshData sphere;
+	GeometryGenerator::MeshData cylinder;
 
-	UINT vertex_count = 0;
-	UINT trianle_count = 0;
-	std::string ignore;
+	GeometryGenerator generator;
 
-	fin >> ignore >> vertex_count;
-	fin >> ignore >> trianle_count;
-	fin >> ignore >> ignore >> ignore >> ignore;
+	generator.CreateBox(1.f, 1.f, 1.f, box);
+	generator.CreateGrid(20.f, 30.f, 60, 40, grid);
+	generator.CreateSphere(.5f, 20, 20, sphere);
+	generator.CreateCylinder(.5f, .3f, 3.f, 20, 20, cylinder);
 
-	float nx, ny, nz;
+	// Cache the vertex offsets to each object in the concatenated vertex buffer.
+	box_vertex_offset_ = 0;
+	grid_vertex_offset_ = box.Vertices.size();
+	sphere_vertex_offset_ = grid_vertex_offset_ + grid.Vertices.size();
+	cylinder_vertex_offset_ = sphere_vertex_offset_ + sphere.Vertices.size();
+
+	// Cache the index count of each object.
+	box_index_count_ = box.Indices.size();
+	grid_index_count_ = grid.Indices.size();
+	sphere_index_count_ = sphere.Indices.size();
+	cylinder_index_count_ = cylinder.Indices.size();
+
+	// Cache the starting index for each object in the concatenated index buffer.
+	box_index_offset_ = 0;
+	grid_index_offset_ = box_index_count_;
+	sphere_index_offset_ = grid_index_offset_ + grid_index_count_;
+	cylinder_index_offset_ = sphere_index_offset_ + sphere_index_count_;
+
+	UINT total_vertex_count =
+		box.Vertices.size() +
+		grid.Vertices.size() +
+		sphere.Vertices.size() +
+		cylinder.Vertices.size();
+
+	UINT total_index_count =
+		box_index_count_ +
+		grid_index_count_ +
+		sphere_index_count_ +
+		cylinder_index_count_;
+
+	// Extract the vertex elements we are interested in and pack the
+	// vertices of all the meshes into one vertex buffer.
+	std::vector<Vertex> v(total_vertex_count);
+
 	XMFLOAT4 black(0.f, 0.f, 0.f, 1.f);
 
-	std::vector<Vertex> vertices(vertex_count);
-	for (UINT i = 0; i < vertex_count; ++i)
+	UINT k = 0;
+	// box
+	for (int i = 0; i < box.Vertices.size(); ++i, ++k)
 	{
-		auto& pos = vertices[i].Pos;
-		fin >> pos.x >> pos.y >> pos.z;
-
-		vertices[i].Color = black;
-
-		// Normal not used in this demo.
-		fin >> nx >> ny >> nz;
-
+		v[k].Pos = box.Vertices[i].Position;
+		v[k].Color = black;
 	}
-
-	fin >> ignore >> ignore >> ignore;
-	index_count_ = 3 * trianle_count;
-	std::vector<UINT> indices(index_count_);
-	for (UINT i = 0; i < trianle_count; ++i)
+	// grid
+	for (int i = 0; i < grid.Vertices.size(); ++i, ++k)
 	{
-		fin >> indices[3 * i] >> indices[3 * i + 1] >> indices[3 * i + 2];
+		v[k].Pos = grid.Vertices[i].Position;
+		v[k].Color = black;
 	}
-
-	fin.close();
+	// sphere
+	for (int i = 0; i < sphere.Vertices.size(); ++i, ++k)
+	{
+		v[k].Pos = sphere.Vertices[i].Position;
+		v[k].Color = black;
+	}
+	// cylinder
+	for (int i = 0; i < cylinder.Vertices.size(); ++i, ++k)
+	{
+		v[k].Pos = cylinder.Vertices[i].Position;
+		v[k].Color = black;
+	}
 
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(Vertex) * vertices.size();
+	vbd.ByteWidth = sizeof(Vertex) * total_vertex_count;
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vbd.CPUAccessFlags = 0;
 	vbd.MiscFlags = 0;
 
 	D3D11_SUBRESOURCE_DATA vinitData;
-	vinitData.pSysMem = &vertices[0];
+	vinitData.pSysMem = &v[0];
 
 	HR(d3d_device_->CreateBuffer(&vbd, &vinitData, &vertex_buffer_));
 
+
 	// Pack the indices of all the meshes into one index buffer.
+	std::vector<UINT> indices;
+	indices.insert(indices.end(), box.Indices.begin(), box.Indices.end());
+	indices.insert(indices.end(), grid.Indices.begin(), grid.Indices.end());
+	indices.insert(indices.end, sphere.Indices.begin(), sphere.Indices.end());
+	indices.insert(indices.end(), cylinder.Indices.begin(), cylinder.Indices.end());
+
 	D3D11_BUFFER_DESC ibd;
 	ibd.Usage = D3D11_USAGE_IMMUTABLE;
-	ibd.ByteWidth = sizeof(UINT) * index_count_;
+	ibd.ByteWidth = sizeof(UINT) * total_index_count;
 	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	ibd.CPUAccessFlags = 0;
 	ibd.MiscFlags = 0;
@@ -205,7 +254,7 @@ void HillsApp::BuildGeometryBuffers()
 	HR(d3d_device_->CreateBuffer(&ibd, &iinitData, &index_buffer_));
 }
 
-void HillsApp::BuildFX()
+void ShapesApp::BuildFX()
 {
 	std::ifstream fin("fx/color.fxo", std::ios::binary);
 
@@ -225,7 +274,7 @@ void HillsApp::BuildFX()
 	fx_WVP_ = fx_->GetVariableByName("gWorldViewProj")->AsMatrix();
 }
 
-void HillsApp::BuildVertexLayout()
+void ShapesApp::BuildVertexLayout()
 {
 	// Create the vertex input layout.
 	D3D11_INPUT_ELEMENT_DESC vertex_desc[] = {
@@ -240,7 +289,7 @@ void HillsApp::BuildVertexLayout()
 		pass_desc.IAInputSignatureSize, &input_layout_));
 }
 
-void HillsApp::OnResize()
+void ShapesApp::OnResize()
 {
 	D3DApp::OnResize();
 
@@ -248,7 +297,7 @@ void HillsApp::OnResize()
 	XMStoreFloat4x4(&proj_, p);
 }
 
-void HillsApp::UpdateScene(float dt)
+void ShapesApp::UpdateScene(float dt)
 {
 	// Convert Spherical to Cartesian coordinates.
 	float x = radius_*sinf(phi_)*cosf(theta_);
@@ -264,7 +313,7 @@ void HillsApp::UpdateScene(float dt)
 	XMStoreFloat4x4(&view_, v);
 }
 
-void HillsApp::DrawScene()
+void ShapesApp::DrawScene()
 {
 	d3d_context_->ClearRenderTargetView(render_target_view_, (const float*)&Colors::LightSteelBlue);
 	d3d_context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -280,25 +329,55 @@ void HillsApp::DrawScene()
 	d3d_context_->IASetIndexBuffer(index_buffer_, DXGI_FORMAT_R32_UINT, 0);
 
 	// Set constants
-	XMMATRIX world = XMLoadFloat4x4(&world_);
 	XMMATRIX view = XMLoadFloat4x4(&view_);
 	XMMATRIX proj = XMLoadFloat4x4(&proj_);
-	XMMATRIX wvp = world * view * proj;
-
-	fx_WVP_->SetMatrix((float*)&wvp);
+	XMMATRIX view_proj = view * proj;
 
 	D3DX11_TECHNIQUE_DESC tech_desc;
 	technique_->GetDesc(&tech_desc);
 	for (int p = 0; p < tech_desc.Passes; ++p)
 	{
+		// draw grid
+		XMMATRIX word = XMLoadFloat4x4(&grid_world_);
+		fx_WVP_->SetMatrix((float*)&(word * view_proj));
 		technique_->GetPassByIndex(p)->Apply(0, d3d_context_);
-		d3d_context_->DrawIndexed(index_count_, 0, 0);
+		d3d_context_->DrawIndexed(grid_index_count_, grid_index_offset_, grid_vertex_offset_);
+
+		// draw box
+		word = XMLoadFloat4x4(&box_world_);
+		fx_WVP_->SetMatrix((float*)&(word * view_proj));
+		technique_->GetPassByIndex(p)->Apply(0, d3d_context_);
+		d3d_context_->DrawIndexed(box_index_count_, box_index_offset_, box_vertex_offset_);
+
+		// draw center sphere
+		word = XMLoadFloat4x4(&center_sphere_world_);
+		fx_WVP_->SetMatrix((float*)&(word * view_proj));
+		technique_->GetPassByIndex(p)->Apply(0, d3d_context_);
+		d3d_context_->DrawIndexed(sphere_index_count_, sphere_index_offset_, sphere_vertex_offset_);
+	
+		// draw 10 cylinders
+		for (int i = 0; i < 10; ++i)
+		{
+			word = XMLoadFloat4x4(&cylinder_world_[i]);
+			fx_WVP_->SetMatrix((float*)&(word * view_proj));
+			technique_->GetPassByIndex(p)->Apply(0, d3d_context_);
+			d3d_context_->DrawIndexed(cylinder_index_count_, cylinder_index_offset_, cylinder_vertex_offset_);
+		}
+
+		// draw 10 sphere
+		for (int i = 0; i < 10; ++i)
+		{
+			word = XMLoadFloat4x4(&sphere_world_[i]);
+			fx_WVP_->SetMatrix((float*)&(word * view_proj));
+			technique_->GetPassByIndex(p)->Apply(0, d3d_context_);
+			d3d_context_->DrawIndexed(sphere_index_count_, sphere_index_offset_, sphere_vertex_offset_);
+		}
 	}
 
 	HR(swap_chain_->Present(0, 0));
 }
 
-void HillsApp::OnMouseDown(WPARAM btn_state, int x, int y)
+void ShapesApp::OnMouseDown(WPARAM btn_state, int x, int y)
 {
 	last_mouse_pos_.x = x;
 	last_mouse_pos_.y = y;
@@ -306,12 +385,12 @@ void HillsApp::OnMouseDown(WPARAM btn_state, int x, int y)
 	SetCapture(main_wnd_);
 }
 
-void HillsApp::OnMouseUp(WPARAM btn_state, int x, int y)
+void ShapesApp::OnMouseUp(WPARAM btn_state, int x, int y)
 {
 	ReleaseCapture();
 }
 
-void HillsApp::OnMouseMove(WPARAM btn_state, int x, int y)
+void ShapesApp::OnMouseMove(WPARAM btn_state, int x, int y)
 {
 	if ((btn_state & MK_LBUTTON) != 0)
 	{
@@ -350,7 +429,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	HillsApp theApp(hInstance);
+	ShapesApp theApp(hInstance);
 
 	if (!theApp.Init())
 	{
