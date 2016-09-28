@@ -1,0 +1,9 @@
+*.user
+D3D11_App/D3D11_App/FX/color.cod
+*.log
+*.suo
+*.db
+*.tlog
+*.obj
+*.idb
+*.pdb

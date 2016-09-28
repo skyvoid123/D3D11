@@ -25,7 +25,6 @@ public:
 	virtual void OnMouseMove(WPARAM btn_state, int x, int y) override;
 
 private:
-	float GetHeight(float x, float z) const;
 	void BuildGeometryBuffers();
 	void BuildFX();
 	void BuildVertexLayout();
@@ -40,12 +39,32 @@ private:
 
 	ID3D11InputLayout* input_layout_;
 
+	ID3D11RasterizerState* wireframe_RS_;
+
 	// Define transformations from local spaces to world space.
-	XMFLOAT4X4 world_;
+	XMFLOAT4X4 sphere_world_[10];
+	XMFLOAT4X4 cylinder_world_[10];
+	XMFLOAT4X4 box_world_;
+	XMFLOAT4X4 grid_world_;
+	XMFLOAT4X4 center_sphere_world_;
+
 	XMFLOAT4X4 view_;
 	XMFLOAT4X4 proj_;
-	
-	UINT index_count_;
+
+	int box_vertex_offset_;
+	int grid_vertex_offset_;
+	int sphere_vertex_offset_;
+	int cylinder_vertex_offset_;
+
+	UINT box_index_offset_;
+	UINT grid_index_offset_;
+	UINT sphere_index_offset_;
+	UINT cylinder_index_offset_;
+
+	UINT box_index_count_;
+	UINT grid_index_count_;
+	UINT sphere_index_count_;
+	UINT cylinder_index_count_;
 
 	float theta_;
 	float phi_;
@@ -62,20 +81,28 @@ HillsApp::HillsApp(HINSTANCE hInstance)
 	, technique_(nullptr)
 	, fx_WVP_(nullptr)
 	, input_layout_(nullptr)
-	, index_count_(0)
+	, wireframe_RS_(nullptr)
 	, theta_(1.5f * MathHelper::Pi)
 	, phi_(0.1f * MathHelper::Pi)
 	, radius_(200.0f)
 {
-	main_wnd_caption_ = L"Hills Demo";
+	main_wnd_caption_ = L"Shapes Demo";
 
 	last_mouse_pos_.x = 0;
 	last_mouse_pos_.y = 0;
 
 	XMMATRIX I = XMMatrixIdentity();
-	XMStoreFloat4x4(&world_, I);
+	XMStoreFloat4x4(&grid_world_, I);
 	XMStoreFloat4x4(&view_, I);
 	XMStoreFloat4x4(&proj_, I);
+
+	XMMATRIX box_scale = XMMatrixScaling(2.f, 1.f, 2.f);
+	XMMATRIX box_offset = XMMatrixTranslation(0.f, .5f, 0.f);
+	XMStoreFloat4x4(&box_world_, XMMatrixMultiply(box_scale, box_offset));
+
+	XMMATRIX center_sphere_scale = XMMatrixScaling(2.f, 2.f, 2.f);
+	XMMATRIX center_sphere_offset = XMMatrixTranslation(0.f, 2.f, 0.f);
+	XMStoreFloat4x4(&center_sphere_world_)
 }
 
 HillsApp::~HillsApp()
@@ -84,6 +111,7 @@ HillsApp::~HillsApp()
 	ReleaseCOM(index_buffer_);
 	ReleaseCOM(fx_);
 	ReleaseCOM(input_layout_);
+	ReleaseCOM(wireframe_RS_);
 }
 
 bool HillsApp::Init()
@@ -95,68 +123,72 @@ bool HillsApp::Init()
 	BuildGeometryBuffers();
 	BuildFX();
 	BuildVertexLayout();
-	
+
+	D3D11_RASTERIZER_DESC desc;
+	ZeroMemory(&desc, sizeof(desc));
+	desc.FillMode = D3D11_FILL_WIREFRAME;
+	desc.CullMode = D3D11_CULL_BACK;
+	desc.FrontCounterClockwise = false;
+	desc.DepthClipEnable = true;
+
+	HR(d3d_device_->CreateRasterizerState(&desc, &wireframe_RS_));
+
 	return true;
 }
 
 void HillsApp::BuildGeometryBuffers()
 {
-	GeometryGenerator::MeshData grid;
-	GeometryGenerator geometry_generator;
-
-	geometry_generator.CreateGrid(150.0f, 150.0f, 500, 500, grid);
-
-	index_count_ = grid.Indices.size();
-
-	// Extract the vertex elements we are interested and apply the height function to
-	// each vertex.  In addition, color the vertices based on their height so we have
-	// sandy looking beaches, grassy low hills, and snow mountain peaks.
-	std::vector<Vertex> v(grid.Vertices.size());
-
-	for (int i = 0; i < grid.Vertices.size(); ++i)
+	std::ifstream fin("Models/skull.txt");
+	if (!fin)
 	{
-		XMFLOAT3 pos = grid.Vertices[i].Position;
-		pos.y = GetHeight(pos.x, pos.z);
-		v[i].Pos = pos;
-
-		// Color the vertex based on its height.
-		if (pos.y < -10.f)
-		{
-			// Sandy beach color.
-			v[i].Color = XMFLOAT4(1.f, 0.96f, 0.62f, 1.0f);
-		}
-		else if (pos.y < 5.f)
-		{
-			// Light yellow-green.
-			v[i].Color = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
-		}
-		else if (pos.y < 12.f)
-		{
-			// Dark yellow-green.
-			v[i].Color = XMFLOAT4(0.1f, 0.48f, 0.19f, 1.0f);
-		}
-		else if (pos.y < 20.f)
-		{
-			// Dark brown.
-			v[i].Color = XMFLOAT4(0.45f, 0.39f, 0.34f, 1.0f);
-		}
-		else
-		{
-			// White snow.
-			v[i].Color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		}
+		MessageBox(0, L"Models/skull.txt not found.", 0, 0);
+		return;
 	}
+
+	UINT vertex_count = 0;
+	UINT trianle_count = 0;
+	std::string ignore;
+
+	fin >> ignore >> vertex_count;
+	fin >> ignore >> trianle_count;
+	fin >> ignore >> ignore >> ignore >> ignore;
+
+	float nx, ny, nz;
+	XMFLOAT4 black(0.f, 0.f, 0.f, 1.f);
+
+	std::vector<Vertex> vertices(vertex_count);
+	for (UINT i = 0; i < vertex_count; ++i)
+	{
+		auto& pos = vertices[i].Pos;
+		fin >> pos.x >> pos.y >> pos.z;
+
+		vertices[i].Color = black;
+
+		// Normal not used in this demo.
+		fin >> nx >> ny >> nz;
+
+	}
+
+	fin >> ignore >> ignore >> ignore;
+	index_count_ = 3 * trianle_count;
+	std::vector<UINT> indices(index_count_);
+	for (UINT i = 0; i < trianle_count; ++i)
+	{
+		fin >> indices[3 * i] >> indices[3 * i + 1] >> indices[3 * i + 2];
+	}
+
+	fin.close();
 
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(Vertex) * grid.Vertices.size();
+	vbd.ByteWidth = sizeof(Vertex) * vertices.size();
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vbd.CPUAccessFlags = 0;
 	vbd.MiscFlags = 0;
-	
+
 	D3D11_SUBRESOURCE_DATA vinitData;
-	vinitData.pSysMem = &v[0];
-	
+	vinitData.pSysMem = &vertices[0];
+
 	HR(d3d_device_->CreateBuffer(&vbd, &vinitData, &vertex_buffer_));
 
 	// Pack the indices of all the meshes into one index buffer.
@@ -168,7 +200,7 @@ void HillsApp::BuildGeometryBuffers()
 	ibd.MiscFlags = 0;
 
 	D3D11_SUBRESOURCE_DATA iinitData;
-	iinitData.pSysMem = &grid.Indices[0];
+	iinitData.pSysMem = &indices[0];
 
 	HR(d3d_device_->CreateBuffer(&ibd, &iinitData, &index_buffer_));
 }
@@ -180,7 +212,7 @@ void HillsApp::BuildFX()
 	fin.seekg(0, std::ios_base::end);
 	int size = (int)fin.tellg();
 	fin.seekg(0, std::ios_base::beg);
-	
+
 	std::vector<char> compiled_shader(size);
 
 	fin.read(&compiled_shader[0], size);
@@ -197,8 +229,8 @@ void HillsApp::BuildVertexLayout()
 {
 	// Create the vertex input layout.
 	D3D11_INPUT_ELEMENT_DESC vertex_desc[] = {
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	// Create the input layout
@@ -240,6 +272,8 @@ void HillsApp::DrawScene()
 	d3d_context_->IASetInputLayout(input_layout_);
 	d3d_context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+	d3d_context_->RSSetState(wireframe_RS_);
+
 	UINT stride = sizeof(Vertex);
 	UINT off = 0;
 	d3d_context_->IASetVertexBuffers(0, 1, &vertex_buffer_, &stride, &off);
@@ -251,12 +285,12 @@ void HillsApp::DrawScene()
 	XMMATRIX proj = XMLoadFloat4x4(&proj_);
 	XMMATRIX wvp = world * view * proj;
 
+	fx_WVP_->SetMatrix((float*)&wvp);
+
 	D3DX11_TECHNIQUE_DESC tech_desc;
 	technique_->GetDesc(&tech_desc);
 	for (int p = 0; p < tech_desc.Passes; ++p)
 	{
-		// Draw the grid.
-		fx_WVP_->SetMatrix((float*)&wvp);
 		technique_->GetPassByIndex(p)->Apply(0, d3d_context_);
 		d3d_context_->DrawIndexed(index_count_, 0, 0);
 	}
@@ -307,11 +341,6 @@ void HillsApp::OnMouseMove(WPARAM btn_state, int x, int y)
 
 	last_mouse_pos_.x = x;
 	last_mouse_pos_.y = y;
-}
-
-float HillsApp::GetHeight(float x, float z) const
-{
-	return 0.3f * (z * sinf(0.1f * x) + x * cosf(0.1f * z));
 }
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)

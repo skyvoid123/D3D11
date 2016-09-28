@@ -75,6 +75,177 @@ void GeometryGenerator::CreateBox(float width, float height, float depth, MeshDa
 	meshData.Indices.assign(&i[0], &i[36]);
 }
 
+void GeometryGenerator::CreateSphere(float radius, UINT sliceCount, UINT stackCount, MeshData& meshData)
+{
+	meshData.Vertices.clear();
+	meshData.Indices.clear();
+
+	// Compute the vertices stating at the top pole and moving down the stacks.
+
+	// Poles: note that there will be texture coordinate distortion as there is
+	// not a unique point on the texture map to assign to the pole when mapping
+	// a rectangular texture onto a sphere.
+	Vertex topVertex(0.0f, radius, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	Vertex bottomVertex(0.0f, -radius, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+
+	meshData.Vertices.push_back(topVertex);
+
+	float phiStep = XM_PI / stackCount;
+	float thetaStep = 2 * XM_PI / sliceCount;
+
+	// Compute vertices for each stack ring (do not count the poles as rings).
+	for (UINT i = 1; i < stackCount; ++i)
+	{
+		float phi = i * phiStep;
+		// Vertices of ring.
+		for (UINT j = 0; j <= sliceCount; ++j)
+		{
+			float theta = j * thetaStep;
+
+			Vertex v;
+			v.Position.x = radius * sinf(phi) * cosf(theta);
+			v.Position.y = radius * cosf(phi);
+			v.Position.z = radius * sinf(phi) * sinf(theta);
+
+			// Partial derivative of P with respect to theta
+			v.TangentU.x = -radius * sinf(phi) * sinf(theta);
+			v.TangentU.y = 0;
+			v.TangentU.z = radius * sinf(phi) * cosf(theta);
+
+			XMVECTOR T = XMLoadFloat3(&v.TangentU);
+			XMStoreFloat3(&v.TangentU, XMVector3Normalize(T));
+
+			XMVECTOR p = XMLoadFloat3(&v.Position);
+			XMStoreFloat3(&v.Normal, XMVector3Normalize(p));
+
+			v.TexC.x = (float)j / sliceCount;
+			v.TexC.y = (float)i / stackCount;
+
+			meshData.Vertices.push_back(v);
+		}
+	}
+
+	meshData.Vertices.push_back(bottomVertex);
+
+	// Compute indices for top stack.  The top stack was written first to the vertex buffer
+	// and connects the top pole to the first ring.
+	for (UINT i = 1; i <= sliceCount; ++i)
+	{
+		meshData.Indices.push_back(0);
+		meshData.Indices.push_back(i + 1);
+		meshData.Indices.push_back(i);
+	}
+
+	// Compute indices for inner stacks (not connected to poles).
+
+	// Offset the indices to the index of the first vertex in the first ring.
+	// This is just skipping the top pole vertex.
+	UINT baseIndex = 1;
+	UINT ringVertexCount = sliceCount + 1;
+	for (UINT i = 0; i < stackCount - 2; ++i)
+	{
+		for (UINT j = 0; j < sliceCount; ++j)
+		{
+			meshData.Indices.push_back(baseIndex + i*ringVertexCount + j);
+			meshData.Indices.push_back(baseIndex + i*ringVertexCount + j+1);
+			meshData.Indices.push_back(baseIndex + (i+1)*ringVertexCount + j);
+
+			meshData.Indices.push_back(baseIndex + (i + 1)*ringVertexCount + j);
+			meshData.Indices.push_back(baseIndex + i*ringVertexCount + j + 1);
+			meshData.Indices.push_back(baseIndex + (i + 1)*ringVertexCount + j+1);
+		}
+	}
+
+	// Compute indices for bottom stack.  The bottom stack was written last to the vertex buffer
+	// and connects the bottom pole to the bottom ring.
+
+	// South pole vertex was added last.
+	UINT southPoleIndex = (UINT)meshData.Vertices.size() - 1;
+
+	// Offset the indices to the index of the first vertex in the last ring.
+	baseIndex = southPoleIndex - ringVertexCount;
+
+	for (UINT i = 0; i < sliceCount; ++i)
+	{
+		meshData.Indices.push_back(baseIndex + i);
+		meshData.Indices.push_back(baseIndex + i + 1);
+		meshData.Indices.push_back(southPoleIndex);
+	}
+}
+
+void GeometryGenerator::Subdivide(MeshData& meshData)
+{
+	// Save a copy of the input geometry.
+	MeshData inputCopy = meshData;
+
+	meshData.Vertices.resize(0);
+	meshData.Indices.resize(0);
+
+	//       v1
+	//       *
+	//      / \
+	//     /   \
+	//  m0*-----*m1
+	//   / \   / \
+	//  /   \ /   \
+	// *-----*-----*
+	// v0    m2     v2
+
+	UINT numTris = inputCopy.Indices.size() / 3;
+	for (UINT i = 0; i < numTris; ++i)
+	{
+		Vertex v0 = inputCopy.Vertices[inputCopy.Indices[i * 3]];
+		Vertex v1 = inputCopy.Vertices[inputCopy.Indices[i * 3 + 1]];
+		Vertex v2 = inputCopy.Vertices[inputCopy.Indices[i * 3 + 2]];
+
+		// Generate the midpoints.
+		Vertex m0, m1, m2;
+
+		// For subdivision, we just care about the position component.  We derive the other
+		// vertex components in CreateGeosphere.
+		m0.Position = XMFLOAT3(
+			0.5f*(v0.Position.x + v1.Position.x),
+			0.5f*(v0.Position.y + v1.Position.y),
+			0.5f*(v0.Position.z + v1.Position.z));
+
+		m1.Position = XMFLOAT3(
+			0.5f*(v1.Position.x + v2.Position.x),
+			0.5f*(v1.Position.y + v2.Position.y),
+			0.5f*(v1.Position.z + v2.Position.z));
+
+		m2.Position = XMFLOAT3(
+			0.5f*(v0.Position.x + v2.Position.x),
+			0.5f*(v0.Position.y + v2.Position.y),
+			0.5f*(v0.Position.z + v2.Position.z));
+
+		// Add new geometry.
+		meshData.Vertices.push_back(v0); // 0
+		meshData.Vertices.push_back(v1); // 1
+		meshData.Vertices.push_back(v2); // 2
+		meshData.Vertices.push_back(m0); // 3
+		meshData.Vertices.push_back(m1); // 4
+		meshData.Vertices.push_back(m2); // 5
+
+		meshData.Indices.push_back(i * 6 + 0);
+		meshData.Indices.push_back(i * 6 + 3);
+		meshData.Indices.push_back(i * 6 + 5);
+
+		meshData.Indices.push_back(i * 6 + 3);
+		meshData.Indices.push_back(i * 6 + 4);
+		meshData.Indices.push_back(i * 6 + 5);
+
+		meshData.Indices.push_back(i * 6 + 5);
+		meshData.Indices.push_back(i * 6 + 4);
+		meshData.Indices.push_back(i * 6 + 2);
+
+		meshData.Indices.push_back(i * 6 + 3);
+		meshData.Indices.push_back(i * 6 + 1);
+		meshData.Indices.push_back(i * 6 + 4);
+
+	}
+}
+
+
 
 void GeometryGenerator::CreateGrid(float width, float depth, UINT m, UINT n, MeshData& meshData)
 {

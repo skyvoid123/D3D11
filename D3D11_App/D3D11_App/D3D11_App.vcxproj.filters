@@ -56,7 +56,10 @@
     <ClCompile Include="Common\dxerr.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Chapter5_Drawing\HillsDrawing.cpp">
+    <ClCompile Include="Chapter5_Drawing\SkullDrawing.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter5_Drawing\ShapesDrawing.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
