@@ -238,7 +238,7 @@ void ShapesApp::BuildGeometryBuffers()
 	std::vector<UINT> indices;
 	indices.insert(indices.end(), box.Indices.begin(), box.Indices.end());
 	indices.insert(indices.end(), grid.Indices.begin(), grid.Indices.end());
-	indices.insert(indices.end, sphere.Indices.begin(), sphere.Indices.end());
+	indices.insert(indices.end(), sphere.Indices.begin(), sphere.Indices.end());
 	indices.insert(indices.end(), cylinder.Indices.begin(), cylinder.Indices.end());
 
 	D3D11_BUFFER_DESC ibd;
