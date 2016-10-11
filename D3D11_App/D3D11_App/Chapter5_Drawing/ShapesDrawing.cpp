@@ -84,7 +84,7 @@ ShapesApp::ShapesApp(HINSTANCE hInstance)
 	, wireframe_RS_(nullptr)
 	, theta_(1.5f * MathHelper::Pi)
 	, phi_(0.1f * MathHelper::Pi)
-	, radius_(200.0f)
+	, radius_(15.0f)
 {
 	main_wnd_caption_ = L"Shapes Demo";
 
@@ -109,8 +109,8 @@ ShapesApp::ShapesApp(HINSTANCE hInstance)
 		XMStoreFloat4x4(&cylinder_world_[i * 2], XMMatrixTranslation(-5.f, 1.5f, -10.f + i*5.f));
 		XMStoreFloat4x4(&cylinder_world_[i * 2 + 1], XMMatrixTranslation(5.f, 1.5f, -10.f + i*5.f));
 
-		XMStoreFloat4x4(&sphere_world_[i * 2], XMMatrixTranslation(-5.f, 3.5f, 10.f + i*5.f));
-		XMStoreFloat4x4(&sphere_world_[i * 2 + 1], XMMatrixTranslation(5.f, 3.5f, 10.f + i*5.f));
+		XMStoreFloat4x4(&sphere_world_[i * 2], XMMatrixTranslation(-5.f, 3.5f, -10.f + i*5.f));
+		XMStoreFloat4x4(&sphere_world_[i * 2 + 1], XMMatrixTranslation(5.f, 3.5f, -10.f + i*5.f));
 	}
 }
 
@@ -408,14 +408,14 @@ void ShapesApp::OnMouseMove(WPARAM btn_state, int x, int y)
 	else if ((btn_state & MK_RBUTTON) != 0)
 	{
 		// Make each pixel correspond to 0.2 unit in the scene.
-		float dx = 0.2f * (float)(x - last_mouse_pos_.x);
-		float dy = 0.2f * (float)(y - last_mouse_pos_.y);
+		float dx = 0.01f * (float)(x - last_mouse_pos_.x);
+		float dy = 0.01f * (float)(y - last_mouse_pos_.y);
 
 		// Update the camera radius based on input.
 		radius_ += dx - dy;
 
 		// Restrict the radius.
-		radius_ = MathHelper::Clamp(radius_, 50.0f, 500.0f);
+		radius_ = MathHelper::Clamp(radius_, 3.0f, 200.0f);
 	}
 
 	last_mouse_pos_.x = x;
