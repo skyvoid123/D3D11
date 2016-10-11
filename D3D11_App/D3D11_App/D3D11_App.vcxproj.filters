@@ -39,6 +39,9 @@
     <ClInclude Include="Common\dxerr.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Chapter5_Drawing\Waves.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\GameTimer.cpp">
@@ -56,7 +59,10 @@
     <ClCompile Include="Common\dxerr.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Chapter5_Drawing\ShapesDrawing.cpp">
+    <ClCompile Include="Chapter5_Drawing\Waves.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter5_Drawing\WavesDrawing.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

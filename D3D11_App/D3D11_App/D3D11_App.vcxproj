@@ -74,8 +74,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\Microsoft DirectX SDK %28June 2010%29\Include;D:\D3D11\D3D11_App\D3D11_App\Common;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\D3D11\D3D11_App\D3D11_App\Common;D:\Microsoft DirectX SDK %28June 2010%29\Lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)Common;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)Common;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Chapter5_Drawing\Waves.h" />
     <ClInclude Include="Common\d3dApp.h" />
     <ClInclude Include="Common\d3dUtil.h" />
     <ClInclude Include="Common\d3dx11effect.h" />
@@ -154,7 +155,8 @@
     <ClInclude Include="Common\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Chapter5_Drawing\ShapesDrawing.cpp" />
+    <ClCompile Include="Chapter5_Drawing\Waves.cpp" />
+    <ClCompile Include="Chapter5_Drawing\WavesDrawing.cpp" />
     <ClCompile Include="Common\d3dApp.cpp" />
     <ClCompile Include="Common\dxerr.cpp" />
     <ClCompile Include="Common\GameTimer.cpp" />
