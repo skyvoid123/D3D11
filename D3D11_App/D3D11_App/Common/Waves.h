@@ -15,11 +15,25 @@ public:
 	UINT ColumnCount() const;
 	UINT VertexCount() const;
 	UINT TriangleCount() const;
+	float Width() const;
+	float Depth() const;
 
 	// Returns the solution at the ith grid point.
-	const XMFLOAT3& operator[] (int i)
+	const XMFLOAT3& operator[] (int i) const
 	{
 		return curr_solution_[i];
+	}
+
+	// Returns the solution normal at the ith grid point.
+	const XMFLOAT3& Normal(int i) const
+	{
+		return normals_[i];
+	}
+
+	// Returns the unit tangent vector at the ith grid point in the local x-axis direction.
+	const XMFLOAT3& TangentX(int i) const
+	{
+		return tangentX_[i];
 	}
 
 	void Init(UINT rows, UINT cols, float dx, float dt, float speed, float damping);
@@ -43,4 +57,6 @@ private:
 
 	XMFLOAT3* prev_solution_;
 	XMFLOAT3* curr_solution_;
+	XMFLOAT3* normals_;
+	XMFLOAT3* tangentX_;
 };

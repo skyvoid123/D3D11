@@ -39,7 +39,10 @@
     <ClInclude Include="Common\dxerr.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Chapter5_Drawing\Waves.h">
+    <ClInclude Include="Common\Waves.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\LightHelper.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -59,14 +62,15 @@
     <ClCompile Include="Common\dxerr.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Chapter5_Drawing\Waves.cpp">
+    <ClCompile Include="Common\Waves.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Chapter5_Drawing\WavesDrawing.cpp">
+    <ClCompile Include="Chapter6_Lighting\LightingDemo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Include="FX\Lighting.fx" />
     <CustomBuild Include="FX\color.fx" />
   </ItemGroup>
 </Project>
