@@ -145,6 +145,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Chapter6_Lighting\Effects.h" />
+    <ClInclude Include="Chapter6_Lighting\Vertex.h" />
     <ClInclude Include="Common\LightHelper.h" />
     <ClInclude Include="Common\Waves.h" />
     <ClInclude Include="Common\d3dApp.h" />
@@ -156,7 +158,9 @@
     <ClInclude Include="Common\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Chapter6_Lighting\LightingDemo.cpp" />
+    <ClCompile Include="Chapter6_Lighting\Effects.cpp" />
+    <ClCompile Include="Chapter6_Lighting\LitSkullDemo.cpp" />
+    <ClCompile Include="Chapter6_Lighting\Vertex.cpp" />
     <ClCompile Include="Common\Waves.cpp" />
     <ClCompile Include="Common\d3dApp.cpp" />
     <ClCompile Include="Common\dxerr.cpp" />
@@ -169,6 +173,13 @@
       <FileType>Document</FileType>
     </CustomBuild>
     <CustomBuild Include="FX\Lighting.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="FX\Basic.fx">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>

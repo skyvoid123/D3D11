@@ -45,6 +45,12 @@
     <ClInclude Include="Common\LightHelper.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Chapter6_Lighting\Vertex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Chapter6_Lighting\Effects.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\GameTimer.cpp">
@@ -65,12 +71,19 @@
     <ClCompile Include="Common\Waves.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Chapter6_Lighting\LightingDemo.cpp">
+    <ClCompile Include="Chapter6_Lighting\Vertex.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter6_Lighting\Effects.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter6_Lighting\LitSkullDemo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="FX\Lighting.fx" />
     <CustomBuild Include="FX\color.fx" />
+    <CustomBuild Include="FX\Basic.fx" />
   </ItemGroup>
 </Project>

@@ -17,6 +17,8 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include "MathHelper.h"
+#include "LightHelper.h"
 
 using namespace DirectX;
 
