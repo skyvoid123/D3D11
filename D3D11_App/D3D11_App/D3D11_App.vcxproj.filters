@@ -51,6 +51,15 @@
     <ClInclude Include="Chapter6_Lighting\Effects.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Chapter7_Texturing\Vertex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Chapter7_Texturing\Effects.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\DDSTextureLoader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\GameTimer.cpp">
@@ -77,7 +86,16 @@
     <ClCompile Include="Chapter6_Lighting\Effects.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Chapter6_Lighting\LitSkullDemo.cpp">
+    <ClCompile Include="Chapter7_Texturing\Vertex.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter7_Texturing\Effects.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter7_Texturing\CrateDemo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\DDSTextureLoader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

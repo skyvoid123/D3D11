@@ -147,6 +147,9 @@
   <ItemGroup>
     <ClInclude Include="Chapter6_Lighting\Effects.h" />
     <ClInclude Include="Chapter6_Lighting\Vertex.h" />
+    <ClInclude Include="Chapter7_Texturing\Effects.h" />
+    <ClInclude Include="Chapter7_Texturing\Vertex.h" />
+    <ClInclude Include="Common\DDSTextureLoader.h" />
     <ClInclude Include="Common\LightHelper.h" />
     <ClInclude Include="Common\Waves.h" />
     <ClInclude Include="Common\d3dApp.h" />
@@ -159,8 +162,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Chapter6_Lighting\Effects.cpp" />
-    <ClCompile Include="Chapter6_Lighting\LitSkullDemo.cpp" />
     <ClCompile Include="Chapter6_Lighting\Vertex.cpp" />
+    <ClCompile Include="Chapter7_Texturing\CrateDemo.cpp" />
+    <ClCompile Include="Chapter7_Texturing\Effects.cpp" />
+    <ClCompile Include="Chapter7_Texturing\Vertex.cpp" />
+    <ClCompile Include="Common\DDSTextureLoader.cpp" />
     <ClCompile Include="Common\Waves.cpp" />
     <ClCompile Include="Common\d3dApp.cpp" />
     <ClCompile Include="Common\dxerr.cpp" />
