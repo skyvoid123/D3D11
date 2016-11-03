@@ -60,6 +60,15 @@
     <ClInclude Include="Common\DDSTextureLoader.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Chapter8_Blending\Vertex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Chapter8_Blending\Effects.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Chapter8_Blending\RenderStates.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\GameTimer.cpp">
@@ -92,10 +101,19 @@
     <ClCompile Include="Chapter7_Texturing\Effects.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Chapter7_Texturing\CrateDemo.cpp">
+    <ClCompile Include="Common\DDSTextureLoader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Common\DDSTextureLoader.cpp">
+    <ClCompile Include="Chapter8_Blending\Vertex.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter8_Blending\Effects.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter8_Blending\RenderStates.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter8_Blending\BlendDemo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
