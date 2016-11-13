@@ -69,6 +69,15 @@
     <ClInclude Include="Chapter8_Blending\RenderStates.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Chapter9_Stenciling\Effects.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Chapter9_Stenciling\Vertex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Chapter9_Stenciling\RenderStates.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\GameTimer.cpp">
@@ -113,7 +122,16 @@
     <ClCompile Include="Chapter8_Blending\RenderStates.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Chapter8_Blending\BlendDemo.cpp">
+    <ClCompile Include="Chapter9_Stenciling\Effects.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter9_Stenciling\Vertex.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter9_Stenciling\RenderStates.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter9_Stenciling\MirrorDemo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
