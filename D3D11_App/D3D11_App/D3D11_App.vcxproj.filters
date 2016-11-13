@@ -76,6 +76,13 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Chapter9_Stenciling\RenderStates.h">
+    <ClInclude Include="Chapter10_GeometryShader\Effects.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Chapter10_GeometryShader\RenderStates.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Chapter10_GeometryShader\Vertex.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -134,10 +141,25 @@
     <ClCompile Include="Chapter9_Stenciling\MirrorDemo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Chapter10_GeometryShader\Effects.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter10_GeometryShader\RenderStates.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter10_GeometryShader\Vertex.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Chapter10_GeometryShader\TreeBillboardDemo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="FX\Lighting.fx" />
     <CustomBuild Include="FX\color.fx" />
     <CustomBuild Include="FX\Basic.fx" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="FX\TreeSprite.fx" />
   </ItemGroup>
 </Project>
