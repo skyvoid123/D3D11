@@ -158,6 +158,7 @@
     <ClInclude Include="Chapter9_Stenciling\Effects.h" />
     <ClInclude Include="Chapter9_Stenciling\RenderStates.h" />
     <ClInclude Include="Chapter9_Stenciling\Vertex.h" />
+    <ClInclude Include="Common\Camera.h" />
     <ClInclude Include="Common\DDSTextureLoader.h" />
     <ClInclude Include="Common\LightHelper.h" />
     <ClInclude Include="Common\Waves.h" />
@@ -184,6 +185,7 @@
     <ClCompile Include="Chapter9_Stenciling\Effects.cpp" />
     <ClCompile Include="Chapter9_Stenciling\RenderStates.cpp" />
     <ClCompile Include="Chapter9_Stenciling\Vertex.cpp" />
+    <ClCompile Include="Common\Camera.cpp" />
     <ClCompile Include="Common\DDSTextureLoader.cpp" />
     <ClCompile Include="Common\Waves.cpp" />
     <ClCompile Include="Common\d3dApp.cpp" />

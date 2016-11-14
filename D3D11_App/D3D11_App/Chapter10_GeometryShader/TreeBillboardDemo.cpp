@@ -9,6 +9,8 @@
 #include "RenderStates.h"
 #include "Waves.h"
 
+#include "Camera.h"
+
 enum RenderOptions
 {
 	Lighting = 0,
@@ -72,8 +74,7 @@ private:
 	XMFLOAT4X4 m_WaveWorld;
 	XMFLOAT4X4 m_CrateWorld;
 
-	XMFLOAT4X4 m_View;
-	XMFLOAT4X4 m_Proj;
+	Camera m_Camera;
 
 	UINT m_LandIndexCount;
 
@@ -84,8 +85,6 @@ private:
 	XMFLOAT2 m_WaterTexOffset;
 
 	RenderOptions m_RenderOptions;
-
-	XMFLOAT3 m_EyePosW;
 
 	float m_Radius;
 	float m_Phi;
@@ -109,7 +108,6 @@ TreeBillboardApp::TreeBillboardApp(HINSTANCE hInstance)
 	, m_AlphaToCoverageOn(true)
 	, m_WaterTexOffset(0.f, 0.f)
 	, m_RenderOptions(RenderOptions::TexturesAndFog)
-	, m_EyePosW(0.f, 0.f, 0.f)
 	, m_Radius(80.f)
 	, m_Phi(.4f * MathHelper::Pi)
 	, m_Theta(1.3f * MathHelper::Pi)
@@ -120,8 +118,6 @@ TreeBillboardApp::TreeBillboardApp(HINSTANCE hInstance)
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&m_LandWorld, I);
 	XMStoreFloat4x4(&m_WaveWorld, I);
-	XMStoreFloat4x4(&m_View, I);
-	XMStoreFloat4x4(&m_Proj, I);
 
 	XMMATRIX crateScale = XMMatrixScaling(15.f, 15.f, 15.f);
 	XMMATRIX crateOffset = XMMatrixTranslation(8.f, 5.f, -15.f);
@@ -224,25 +220,11 @@ void TreeBillboardApp::OnResize()
 {
 	D3DApp::OnResize();
 
-	XMMATRIX P = XMMatrixPerspectiveFovLH(.25f * MathHelper::Pi, AspectRatio(), 1.f, 1000.f);
-	XMStoreFloat4x4(&m_Proj, P);
+	m_Camera.SetLens(.25f * MathHelper::Pi, AspectRatio(), 1.f, 1000.f);
 }
 
 void TreeBillboardApp::UpdateScene(float dt)
 {
-	float x = m_Radius * sinf(m_Phi) * cosf(m_Theta);
-	float z = m_Radius * sinf(m_Phi) * sinf(m_Theta);
-	float y = m_Radius * cosf(m_Phi);
-
-	m_EyePosW = XMFLOAT3(x, y, z);
-
-	auto pos = XMVectorSet(x, y, z, 1.f);
-	auto target = XMVectorZero();
-	auto up = XMVectorSet(0.f, 1.f, 0.f, 0.f);
-
-	auto V = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&m_View, V);
-
 	static float t_base = 0.0f;
 	if ((timer_.TotalTime() - t_base) >= 0.1f)
 	{
@@ -298,6 +280,21 @@ void TreeBillboardApp::UpdateScene(float dt)
 
 	if (GetAsyncKeyState('T') & 0x8000)
 		m_AlphaToCoverageOn = false;
+
+	//
+	// Control the camera.
+	//
+	if (GetAsyncKeyState('W') & 0x8000)
+		m_Camera.Walk(20.0f * dt);
+
+	if (GetAsyncKeyState('S') & 0x8000)
+		m_Camera.Walk(-20.0f * dt);
+
+	if (GetAsyncKeyState('A') & 0x8000)
+		m_Camera.Strafe(-20.0f * dt);
+
+	if (GetAsyncKeyState('D') & 0x8000)
+		m_Camera.Strafe(20.0f * dt);
 }
 
 void TreeBillboardApp::DrawScene()
@@ -305,8 +302,9 @@ void TreeBillboardApp::DrawScene()
 	d3d_context_->ClearRenderTargetView(render_target_view_, (const float*)&Colors::Silver);
 	d3d_context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
-	XMMATRIX view = XMLoadFloat4x4(&m_View);
-	XMMATRIX proj = XMLoadFloat4x4(&m_Proj);
+	m_Camera.UpdateViewMatrix();
+	XMMATRIX view = m_Camera.View();
+	XMMATRIX proj = m_Camera.Proj();
 	XMMATRIX viewProj = view * proj;
 
 	// Draw the tree sprites
@@ -322,7 +320,7 @@ void TreeBillboardApp::DrawScene()
 
 	// Set per frame constants.
 	Effects::BasicFX->SetDirLights(m_DirLights);
-	Effects::BasicFX->SetEyePosW(m_EyePosW);
+	Effects::BasicFX->SetEyePosW(m_Camera.GetPosition());
 	Effects::BasicFX->SetFogColor(Colors::Silver);
 	Effects::BasicFX->SetFogStart(15.f);
 	Effects::BasicFX->SetFogRange(175.f);
@@ -445,24 +443,8 @@ void TreeBillboardApp::OnMouseMove(WPARAM btnState, int x, int y)
 		float dx = XMConvertToRadians(0.25f * (float)(x - m_LastMousePos.x));
 		float dy = XMConvertToRadians(0.25f * (float)(y - m_LastMousePos.y));
 
-		// Update angles based on input to orbit camera around box.
-		m_Theta -= dx;
-		m_Phi -= dy;
-
-		// Restrict the angle mPhi.
-		m_Phi = MathHelper::Clamp(m_Phi, 0.1f, MathHelper::Pi - 0.1f);
-	}
-	else if ((btnState & MK_RBUTTON) != 0)
-	{
-		// Make each pixel correspond to 0.2 unit in the scene.
-		float dx = 0.2f * (float)(x - m_LastMousePos.x);
-		float dy = 0.2f * (float)(y - m_LastMousePos.y);
-
-		// Update the camera radius based on input.
-		m_Radius += dx - dy;
-
-		// Restrict the radius.
-		m_Radius = MathHelper::Clamp(m_Radius, 50.0f, 500.0f);
+		m_Camera.Pitch(dy);
+		m_Camera.RotateY(dx);
 	}
 
 	m_LastMousePos.x = x;
@@ -637,7 +619,7 @@ void TreeBillboardApp::BuildTreeSpritesBuffers()
 void TreeBillboardApp::DrawTreeSprites(CXMMATRIX viewProj)
 {
 	Effects::TreeSpriteFX->SetDirLights(m_DirLights);
-	Effects::TreeSpriteFX->SetEyePosW(m_EyePosW);
+	Effects::TreeSpriteFX->SetEyePosW(m_Camera.GetPosition());
 	Effects::TreeSpriteFX->SetFogColor(Colors::Silver);
 	Effects::TreeSpriteFX->SetFogStart(15.f);
 	Effects::TreeSpriteFX->SetFogRange(175.f);
