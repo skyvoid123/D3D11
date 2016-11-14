@@ -1,165 +1,57 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="头文件">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="资源文件">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Common">
-      <UniqueIdentifier>{0a6cf125-9990-465b-9e7e-ab17c7fa88c7}</UniqueIdentifier>
-    </Filter>
+    <ClCompile Include="Chapter10_GeometryShader\Effects.cpp" />
+    <ClCompile Include="Chapter10_GeometryShader\RenderStates.cpp" />
+    <ClCompile Include="Chapter10_GeometryShader\Vertex.cpp" />
+    <ClCompile Include="Chapter6_Lighting\Effects.cpp" />
+    <ClCompile Include="Chapter6_Lighting\Vertex.cpp" />
+    <ClCompile Include="Chapter7_Texturing\Effects.cpp" />
+    <ClCompile Include="Chapter7_Texturing\Vertex.cpp" />
+    <ClCompile Include="Chapter8_Blending\Effects.cpp" />
+    <ClCompile Include="Chapter8_Blending\RenderStates.cpp" />
+    <ClCompile Include="Chapter8_Blending\Vertex.cpp" />
+    <ClCompile Include="Chapter9_Stenciling\Effects.cpp" />
+    <ClCompile Include="Chapter9_Stenciling\RenderStates.cpp" />
+    <ClCompile Include="Chapter9_Stenciling\Vertex.cpp" />
+    <ClCompile Include="Common\DDSTextureLoader.cpp" />
+    <ClCompile Include="Common\Waves.cpp" />
+    <ClCompile Include="Common\d3dApp.cpp" />
+    <ClCompile Include="Common\dxerr.cpp" />
+    <ClCompile Include="Common\GameTimer.cpp" />
+    <ClCompile Include="Common\GeometryGenerator.cpp" />
+    <ClCompile Include="Common\MathHelper.cpp" />
+    <ClCompile Include="Chapter10_GeometryShader\TreeBillboardDemo.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Common\d3dUtil.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\GameTimer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\d3dx11effect.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\d3dApp.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\MathHelper.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\GeometryGenerator.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\dxerr.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\Waves.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\LightHelper.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Chapter6_Lighting\Vertex.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Chapter6_Lighting\Effects.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Chapter7_Texturing\Vertex.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Chapter7_Texturing\Effects.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\DDSTextureLoader.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Chapter8_Blending\Vertex.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Chapter8_Blending\Effects.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Chapter8_Blending\RenderStates.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Chapter9_Stenciling\Effects.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Chapter9_Stenciling\Vertex.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Chapter9_Stenciling\RenderStates.h">
-    <ClInclude Include="Chapter10_GeometryShader\Effects.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Chapter10_GeometryShader\RenderStates.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Chapter10_GeometryShader\Vertex.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
+    <ClInclude Include="Chapter10_GeometryShader\Effects.h" />
+    <ClInclude Include="Chapter10_GeometryShader\RenderStates.h" />
+    <ClInclude Include="Chapter10_GeometryShader\Vertex.h" />
+    <ClInclude Include="Chapter6_Lighting\Effects.h" />
+    <ClInclude Include="Chapter6_Lighting\Vertex.h" />
+    <ClInclude Include="Chapter7_Texturing\Effects.h" />
+    <ClInclude Include="Chapter7_Texturing\Vertex.h" />
+    <ClInclude Include="Chapter8_Blending\Effects.h" />
+    <ClInclude Include="Chapter8_Blending\RenderStates.h" />
+    <ClInclude Include="Chapter8_Blending\Vertex.h" />
+    <ClInclude Include="Chapter9_Stenciling\Effects.h" />
+    <ClInclude Include="Chapter9_Stenciling\RenderStates.h" />
+    <ClInclude Include="Chapter9_Stenciling\Vertex.h" />
+    <ClInclude Include="Common\DDSTextureLoader.h" />
+    <ClInclude Include="Common\LightHelper.h" />
+    <ClInclude Include="Common\Waves.h" />
+    <ClInclude Include="Common\d3dApp.h" />
+    <ClInclude Include="Common\d3dUtil.h" />
+    <ClInclude Include="Common\d3dx11effect.h" />
+    <ClInclude Include="Common\dxerr.h" />
+    <ClInclude Include="Common\GameTimer.h" />
+    <ClInclude Include="Common\GeometryGenerator.h" />
+    <ClInclude Include="Common\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Common\GameTimer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\d3dApp.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\MathHelper.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\GeometryGenerator.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\dxerr.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\Waves.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Chapter6_Lighting\Vertex.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Chapter6_Lighting\Effects.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Chapter7_Texturing\Vertex.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Chapter7_Texturing\Effects.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Common\DDSTextureLoader.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Chapter8_Blending\Vertex.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Chapter8_Blending\Effects.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Chapter8_Blending\RenderStates.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Chapter9_Stenciling\Effects.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Chapter9_Stenciling\Vertex.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Chapter9_Stenciling\RenderStates.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Chapter9_Stenciling\MirrorDemo.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Chapter10_GeometryShader\Effects.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Chapter10_GeometryShader\RenderStates.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Chapter10_GeometryShader\Vertex.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Chapter10_GeometryShader\TreeBillboardDemo.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="FX\Lighting.fx" />
     <CustomBuild Include="FX\color.fx" />
+    <CustomBuild Include="FX\Lighting.fx" />
     <CustomBuild Include="FX\Basic.fx" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="FX\TreeSprite.fx" />
+    <CustomBuild Include="FX\TreeSprite.fx" />
   </ItemGroup>
 </Project>

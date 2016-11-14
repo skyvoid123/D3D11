@@ -208,6 +208,10 @@ bool TreeBillboardApp::Init()
 		L"Textures/WireFence.dds", &texRes, &m_CrateMapSRV));
 	ReleaseCOM(texRes);
 
+	HR(DirectX::CreateDDSTextureFromFile(d3d_device_,
+		L"Textures/TreeArray4.dds", &texRes, &m_TreeTextureMapArraySRV));
+	ReleaseCOM(texRes);
+
 	BuildLandGeometryBuffers();
 	BuildWaveGeometryBuffers();
 	BuildCrateGeometryBuffers();

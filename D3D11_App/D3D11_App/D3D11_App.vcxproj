@@ -170,9 +170,9 @@
     <ClInclude Include="Common\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Chapter10_GeometryShader\TreeBillboardDemo.cpp" />
     <ClCompile Include="Chapter10_GeometryShader\Effects.cpp" />
     <ClCompile Include="Chapter10_GeometryShader\RenderStates.cpp" />
+    <ClCompile Include="Chapter10_GeometryShader\TreeBillboardDemo.cpp" />
     <ClCompile Include="Chapter10_GeometryShader\Vertex.cpp" />
     <ClCompile Include="Chapter6_Lighting\Effects.cpp" />
     <ClCompile Include="Chapter6_Lighting\Vertex.cpp" />
@@ -181,7 +181,6 @@
     <ClCompile Include="Chapter8_Blending\Effects.cpp" />
     <ClCompile Include="Chapter8_Blending\RenderStates.cpp" />
     <ClCompile Include="Chapter8_Blending\Vertex.cpp" />
-    <ClCompile Include="Chapter9_Stenciling\MirrorDemo.cpp" />
     <ClCompile Include="Chapter9_Stenciling\Effects.cpp" />
     <ClCompile Include="Chapter9_Stenciling\RenderStates.cpp" />
     <ClCompile Include="Chapter9_Stenciling\Vertex.cpp" />

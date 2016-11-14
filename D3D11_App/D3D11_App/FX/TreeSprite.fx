@@ -72,7 +72,7 @@ VertexOut VS(VertexIn vin)
 
  // We expand each point into a quad (4 vertices), so the maximum number of vertices
  // we output per geometry shader invocation is 4.
-[maxvrtexcount(4)]
+[maxvertexcount(4)]
 void GS(point VertexOut gin[1],
         uint primID : SV_PrimitiveID,
         inout TriangleStream<GeoOut> triStream)
@@ -92,8 +92,8 @@ void GS(point VertexOut gin[1],
     float4 v[4];
     v[0] = float4(gin[0].CenterW + halfWidth * right - halfHeight * up, 1.f);
     v[1] = float4(gin[0].CenterW + halfWidth * right + halfHeight * up, 1.f);
-    v[0] = float4(gin[0].CenterW - halfWidth * right - halfHeight * up, 1.f);
-    v[0] = float4(gin[0].CenterW - halfWidth * right + halfHeight * up, 1.f);
+    v[2] = float4(gin[0].CenterW - halfWidth * right - halfHeight * up, 1.f);
+    v[3] = float4(gin[0].CenterW - halfWidth * right + halfHeight * up, 1.f);
 
     // Transform quad vertices to world space and output 
 	// them as a triangle strip.
@@ -133,7 +133,7 @@ float4 PS(GeoOut pin, uniform int gLightCount, uniform bool gUseTexture, uniform
             // Discard pixel if texture alpha < 0.1.  Note that we do this
 			// test as soon as possible so that we can potentially exit the shader 
 			// early, thereby skipping the rest of the shader code.
-            clip(texColor.a - .1f);
+            clip(texColor.a - 0.05f);
         }
     }
 
