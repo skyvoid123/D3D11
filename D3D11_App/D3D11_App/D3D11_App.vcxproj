@@ -145,19 +145,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Chapter10_GeometryShader\Effects.h" />
-    <ClInclude Include="Chapter10_GeometryShader\RenderStates.h" />
-    <ClInclude Include="Chapter10_GeometryShader\Vertex.h" />
-    <ClInclude Include="Chapter6_Lighting\Effects.h" />
-    <ClInclude Include="Chapter6_Lighting\Vertex.h" />
-    <ClInclude Include="Chapter7_Texturing\Effects.h" />
-    <ClInclude Include="Chapter7_Texturing\Vertex.h" />
-    <ClInclude Include="Chapter8_Blending\Effects.h" />
-    <ClInclude Include="Chapter8_Blending\RenderStates.h" />
-    <ClInclude Include="Chapter8_Blending\Vertex.h" />
-    <ClInclude Include="Chapter9_Stenciling\Effects.h" />
-    <ClInclude Include="Chapter9_Stenciling\RenderStates.h" />
-    <ClInclude Include="Chapter9_Stenciling\Vertex.h" />
+    <ClInclude Include="Chapter11_ComputeShader\BlurFilter.h" />
+    <ClInclude Include="Chapter11_ComputeShader\Effects.h" />
+    <ClInclude Include="Chapter11_ComputeShader\RenderStates.h" />
+    <ClInclude Include="Chapter11_ComputeShader\Vertex.h" />
     <ClInclude Include="Common\Camera.h" />
     <ClInclude Include="Common\DDSTextureLoader.h" />
     <ClInclude Include="Common\LightHelper.h" />
@@ -171,20 +162,11 @@
     <ClInclude Include="Common\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Chapter10_GeometryShader\Effects.cpp" />
-    <ClCompile Include="Chapter10_GeometryShader\RenderStates.cpp" />
-    <ClCompile Include="Chapter10_GeometryShader\TreeBillboardDemo.cpp" />
-    <ClCompile Include="Chapter10_GeometryShader\Vertex.cpp" />
-    <ClCompile Include="Chapter6_Lighting\Effects.cpp" />
-    <ClCompile Include="Chapter6_Lighting\Vertex.cpp" />
-    <ClCompile Include="Chapter7_Texturing\Effects.cpp" />
-    <ClCompile Include="Chapter7_Texturing\Vertex.cpp" />
-    <ClCompile Include="Chapter8_Blending\Effects.cpp" />
-    <ClCompile Include="Chapter8_Blending\RenderStates.cpp" />
-    <ClCompile Include="Chapter8_Blending\Vertex.cpp" />
-    <ClCompile Include="Chapter9_Stenciling\Effects.cpp" />
-    <ClCompile Include="Chapter9_Stenciling\RenderStates.cpp" />
-    <ClCompile Include="Chapter9_Stenciling\Vertex.cpp" />
+    <ClCompile Include="Chapter11_ComputeShader\Blur.cpp" />
+    <ClCompile Include="Chapter11_ComputeShader\BlurFilter.cpp" />
+    <ClCompile Include="Chapter11_ComputeShader\Effects.cpp" />
+    <ClCompile Include="Chapter11_ComputeShader\RenderStates.cpp" />
+    <ClCompile Include="Chapter11_ComputeShader\Vertex.cpp" />
     <ClCompile Include="Common\Camera.cpp" />
     <ClCompile Include="Common\DDSTextureLoader.cpp" />
     <ClCompile Include="Common\Waves.cpp" />
@@ -197,6 +179,8 @@
   <ItemGroup>
     <CustomBuild Include="FX\color.fx">
       <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
     </CustomBuild>
     <CustomBuild Include="FX\Lighting.fx">
       <FileType>Document</FileType>
@@ -216,6 +200,13 @@
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="FX\VecAdd.fx">
+      <FileType>Document</FileType>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
