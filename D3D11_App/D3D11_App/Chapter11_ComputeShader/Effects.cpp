@@ -119,8 +119,8 @@ BlurEffect::BlurEffect(ID3D11Device* device, const std::wstring& filename)
 	VertBlurTech = mFx->GetTechniqueByName("VertBlur");
 
 	Weights = mFx->GetVariableByName("gWeights")->AsScalar();
-	InputMap = mFx->GetVariableByName("gInputMap")->AsShaderResource();
-	OutputMap = mFx->GetVariableByName("gOutputMap")->AsUnorderedAccessView();
+	InputMap = mFx->GetVariableByName("gInput")->AsShaderResource();
+	OutputMap = mFx->GetVariableByName("gOutput")->AsUnorderedAccessView();
 }
 
 BlurEffect::~BlurEffect()

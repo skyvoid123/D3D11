@@ -8,7 +8,7 @@
 #include "Vertex.h"
 #include "RenderStates.h"
 #include "Waves.h"
-
+#include "BlurFilter.h"
 #include "Camera.h"
 
 enum RenderOptions
@@ -41,11 +41,12 @@ private:
 	void BuildCrateGeometryBuffers();
 	void BuildTreeSpritesBuffers();
 	void DrawTreeSprites(CXMMATRIX viewProj);
+	void DrawScreenQuad();
+	void DrawWrapper();
 
 	void BuildScreenQuadGeometryBuffers();
 	void BuildOffscreenViews();
-	void DrawScreenQuad();
-	void DrawWrapper();
+	
 
 private:
 	ID3D11Buffer* m_LandVB;
@@ -59,13 +60,20 @@ private:
 
 	ID3D11Buffer* m_TreeSpritesVB;
 
+	ID3D11Buffer* m_ScreenQuadVB;
+	ID3D11Buffer* m_ScreenQuadIB;
+
 	ID3D11ShaderResourceView* m_GrassMapSRV;
 	ID3D11ShaderResourceView* m_WaveMapSRV;
 	ID3D11ShaderResourceView* m_CrateMapSRV;
 	ID3D11ShaderResourceView* m_TreeTextureMapArraySRV;
 
+	ID3D11RenderTargetView* m_OffscreenRTV;
+	ID3D11ShaderResourceView* m_OffscreenSRV;
+	ID3D11UnorderedAccessView* m_OffscreenUAV;
+
 	Waves m_Wave;
-	
+	BlurFilter m_BlurFilter;
 
 	DirectionalLight m_DirLights[3];
 	Material m_LandMat;
@@ -106,10 +114,15 @@ BlurApp::BlurApp(HINSTANCE hInstance)
 	, m_WaveVB(nullptr)
 	, m_WaveIB(nullptr)
 	, m_TreeSpritesVB(nullptr)
+	, m_ScreenQuadVB(nullptr)
+	, m_ScreenQuadIB(nullptr)
 	, m_GrassMapSRV(nullptr)
 	, m_WaveMapSRV(nullptr)
 	, m_CrateMapSRV(nullptr)
 	, m_TreeTextureMapArraySRV(nullptr)
+	, m_OffscreenRTV(nullptr)
+	, m_OffscreenSRV(nullptr)
+	, m_OffscreenUAV(nullptr)
 	, m_LandIndexCount(0)
 	, m_AlphaToCoverageOn(true)
 	, m_WaterTexOffset(0.f, 0.f)
@@ -119,7 +132,7 @@ BlurApp::BlurApp(HINSTANCE hInstance)
 	, m_Theta(1.3f * MathHelper::Pi)
 {
 	main_wnd_caption_ = L"Blur Demo";
-	enable_4x_msaa_ = true;
+	enable_4x_msaa_ = false;
 
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&m_LandWorld, I);
@@ -174,10 +187,15 @@ BlurApp::~BlurApp()
 	ReleaseCOM(m_CrateVB);
 	ReleaseCOM(m_CrateIB);
 	ReleaseCOM(m_TreeSpritesVB);
+	ReleaseCOM(m_ScreenQuadVB);
+	ReleaseCOM(m_ScreenQuadIB);
 	ReleaseCOM(m_GrassMapSRV);
 	ReleaseCOM(m_WaveMapSRV);
 	ReleaseCOM(m_CrateMapSRV);
 	ReleaseCOM(m_TreeTextureMapArraySRV);
+	ReleaseCOM(m_OffscreenRTV);
+	ReleaseCOM(m_OffscreenSRV);
+	ReleaseCOM(m_OffscreenUAV);
 
 	Effects::DestroyAll();
 	InputLayouts::DestroyAll();
@@ -218,6 +236,7 @@ bool BlurApp::Init()
 	BuildWaveGeometryBuffers();
 	BuildCrateGeometryBuffers();
 	BuildTreeSpritesBuffers();
+	BuildScreenQuadGeometryBuffers();
 
 	return true;
 }
@@ -225,6 +244,11 @@ bool BlurApp::Init()
 void BlurApp::OnResize()
 {
 	D3DApp::OnResize();
+
+	// Recreate the resources that depend on the client area size.
+	BuildOffscreenViews();
+	m_BlurFilter.Init(d3d_device_, client_width_, client_height_, DXGI_FORMAT_R8G8B8A8_UNORM);
+
 
 	m_Camera.SetLens(.25f * MathHelper::Pi, AspectRatio(), 1.f, 1000.f);
 }
@@ -305,9 +329,123 @@ void BlurApp::UpdateScene(float dt)
 
 void BlurApp::DrawScene()
 {
+	// Render to our offscreen texture.  Note that we can use the same depth/stencil buffer
+	// we normally use since our offscreen texture matches the dimensions.  
+	d3d_context_->OMSetRenderTargets(1, &m_OffscreenRTV, depth_stencil_view_);
+	d3d_context_->ClearRenderTargetView(m_OffscreenRTV, (const float*)&Colors::Silver);
+	d3d_context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
+
+	//
+	// Draw the scene to the offscreen texture
+	//
+	DrawWrapper();
+
+	//
+	// Restore the back buffer.  The offscreen render target will serve as an input into
+	// the compute shader for blurring, so we must unbind it from the OM stage before we
+	// can use it as an input into the compute shader.
+	//
+
+	d3d_context_->OMSetRenderTargets(1, &render_target_view_, depth_stencil_view_);
+	m_BlurFilter.SetGaussianWeights(4.f);
+	m_BlurFilter.BlurInPlace(d3d_context_, m_OffscreenSRV, m_OffscreenUAV, 4);
+
+	//
+	// Draw fullscreen quad with texture of blurred scene on it.
+	//
+
 	d3d_context_->ClearRenderTargetView(render_target_view_, (const float*)&Colors::Silver);
 	d3d_context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
+	DrawScreenQuad();
+
+	HR(swap_chain_->Present(0, 0));
+}
+
+void BlurApp::DrawTreeSprites(CXMMATRIX viewProj)
+{
+	Effects::TreeSpriteFX->SetDirLights(m_DirLights);
+	Effects::TreeSpriteFX->SetEyePosW(m_Camera.GetPosition());
+	Effects::TreeSpriteFX->SetFogColor(Colors::Silver);
+	Effects::TreeSpriteFX->SetFogStart(15.f);
+	Effects::TreeSpriteFX->SetFogRange(175.f);
+	Effects::TreeSpriteFX->SetViewProj(viewProj);
+	Effects::TreeSpriteFX->SetMaterial(m_TreeMat);
+	Effects::TreeSpriteFX->SetTreeTextureMapArray(m_TreeTextureMapArraySRV);
+
+	d3d_context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	d3d_context_->IASetInputLayout(InputLayouts::TreePointSprite);
+
+	UINT stride = sizeof(Vertex::TreePointSprite);
+	UINT offset = 0;
+
+	d3d_context_->IASetVertexBuffers(0, 1, &m_TreeSpritesVB, &stride, &offset);
+
+
+	ID3DX11EffectTechnique* treeTech;
+	switch (m_RenderOptions)
+	{
+	case Lighting:
+		treeTech = Effects::TreeSpriteFX->Light3Tech;
+		break;
+	case Textures:
+		treeTech = Effects::TreeSpriteFX->Light3TexAlphaClipTech;
+		break;
+	case TexturesAndFog:
+		treeTech = Effects::TreeSpriteFX->Light3TexAlphaClipFogTech;
+		break;
+	default:
+		break;
+	}
+
+	D3DX11_TECHNIQUE_DESC desc;
+	treeTech->GetDesc(&desc);
+	float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	if (m_AlphaToCoverageOn)
+	{
+		d3d_context_->OMSetBlendState(RenderStates::AlphaToCoverageBS, blendFactor, 0xffffffff);
+	}
+	for (int p = 0; p < desc.Passes; ++p)
+	{
+		treeTech->GetPassByIndex(p)->Apply(0, d3d_context_);
+		d3d_context_->Draw(TreeCount, 0);
+	}
+	d3d_context_->OMSetBlendState(nullptr, blendFactor, 0xffffffff);
+
+}
+
+void BlurApp::DrawScreenQuad()
+{
+	d3d_context_->IASetInputLayout(InputLayouts::Basic32);
+	d3d_context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	UINT stride = sizeof(Vertex::Basic32);
+	UINT offset = 0;
+
+	XMMATRIX identity = XMMatrixIdentity();
+
+	d3d_context_->IASetVertexBuffers(0, 1, &m_ScreenQuadVB, &stride, &offset);
+	d3d_context_->IASetIndexBuffer(m_ScreenQuadIB, DXGI_FORMAT_R32_UINT, 0);
+
+	auto texTech = Effects::BasicFX->Light0TexTech;
+	D3DX11_TECHNIQUE_DESC desc;
+	texTech->GetDesc(&desc);
+	for (int p = 0; p < desc.Passes; ++p)
+	{
+		Effects::BasicFX->SetWorld(identity);
+		Effects::BasicFX->SetWorldInvTranspose(identity);
+		Effects::BasicFX->SetWorldViewProj(identity);
+		Effects::BasicFX->SetTexTransform(identity);
+		Effects::BasicFX->SetDiffuseMap(m_OffscreenSRV);
+
+		texTech->GetPassByIndex(p)->Apply(0, d3d_context_);
+		d3d_context_->DrawIndexed(6, 0, 0);
+	}
+
+}
+
+void BlurApp::DrawWrapper()
+{
 	m_Camera.UpdateViewMatrix();
 	XMMATRIX view = m_Camera.View();
 	XMMATRIX proj = m_Camera.Proj();
@@ -424,8 +562,6 @@ void BlurApp::DrawScene()
 
 		d3d_context_->OMSetBlendState(nullptr, blendFactor, 0xffffffff);
 	}
-
-	HR(swap_chain_->Present(0, 0));
 }
 
 void BlurApp::OnMouseDown(WPARAM btnState, int x, int y)
@@ -622,56 +758,79 @@ void BlurApp::BuildTreeSpritesBuffers()
 	HR(d3d_device_->CreateBuffer(&vbd, &vData, &m_TreeSpritesVB));
 }
 
-void BlurApp::DrawTreeSprites(CXMMATRIX viewProj)
+void BlurApp::BuildScreenQuadGeometryBuffers()
 {
-	Effects::TreeSpriteFX->SetDirLights(m_DirLights);
-	Effects::TreeSpriteFX->SetEyePosW(m_Camera.GetPosition());
-	Effects::TreeSpriteFX->SetFogColor(Colors::Silver);
-	Effects::TreeSpriteFX->SetFogStart(15.f);
-	Effects::TreeSpriteFX->SetFogRange(175.f);
-	Effects::TreeSpriteFX->SetViewProj(viewProj);
-	Effects::TreeSpriteFX->SetMaterial(m_TreeMat);
-	Effects::TreeSpriteFX->SetTreeTextureMapArray(m_TreeTextureMapArraySRV);
+	GeometryGenerator::MeshData quad;
+	GeometryGenerator geoGen;
+	geoGen.CreateFullscreenQuad(quad);
 
-	d3d_context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-	d3d_context_->IASetInputLayout(InputLayouts::TreePointSprite);
+	// Extract the vertex elements we are interested in and pack the
+	// vertices of all the meshes into one vertex buffer.
 
-	UINT stride = sizeof(Vertex::TreePointSprite);
-	UINT offset = 0;
-
-	d3d_context_->IASetVertexBuffers(0, 1, &m_TreeSpritesVB, &stride, &offset);
-
-
-	ID3DX11EffectTechnique* treeTech;
-	switch (m_RenderOptions)
+	std::vector<Vertex::Basic32> vertices(quad.Vertices.size());
+	for (int i = 0; i < vertices.size(); ++i)
 	{
-	case Lighting:
-		treeTech = Effects::TreeSpriteFX->Light3Tech;
-		break;
-	case Textures:
-		treeTech = Effects::TreeSpriteFX->Light3TexAlphaClipTech;
-		break;
-	case TexturesAndFog:
-		treeTech = Effects::TreeSpriteFX->Light3TexAlphaClipFogTech;
-		break;
-	default:
-		break;
+		vertices[i].Pos = quad.Vertices[i].Position;
+		vertices[i].Normal = quad.Vertices[i].Normal;
+		vertices[i].Tex = quad.Vertices[i].TexC;
 	}
 
-	D3DX11_TECHNIQUE_DESC desc;
-	treeTech->GetDesc(&desc);
-	float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	if (m_AlphaToCoverageOn)
-	{
-		d3d_context_->OMSetBlendState(RenderStates::AlphaToCoverageBS, blendFactor, 0xffffffff);
-	}
-	for (int p = 0; p < desc.Passes; ++p)
-	{
-		treeTech->GetPassByIndex(p)->Apply(0, d3d_context_);
-		d3d_context_->Draw(TreeCount, 0);
-	}
-	d3d_context_->OMSetBlendState(nullptr, blendFactor, 0xffffffff);
+	D3D11_BUFFER_DESC vbd;
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbd.ByteWidth = sizeof(Vertex::Basic32) * vertices.size();
+	vbd.CPUAccessFlags = 0;
+	vbd.MiscFlags = 0;
+	vbd.Usage = D3D11_USAGE_IMMUTABLE;
 
+	D3D11_SUBRESOURCE_DATA vData;
+	vData.pSysMem = &vertices[0];
+	
+	HR(d3d_device_->CreateBuffer(&vbd, &vData, &m_ScreenQuadVB));
+
+	D3D11_BUFFER_DESC ibd;
+	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	ibd.ByteWidth = sizeof(UINT) * quad.Indices.size();
+	ibd.CPUAccessFlags = 0;
+	ibd.MiscFlags = 0;
+	ibd.Usage = D3D11_USAGE_IMMUTABLE;
+
+	D3D11_SUBRESOURCE_DATA iData;
+	iData.pSysMem = &quad.Indices[0];
+
+	HR(d3d_device_->CreateBuffer(&ibd, &iData, &m_ScreenQuadIB));
+}
+
+void BlurApp::BuildOffscreenViews()
+{
+	// We call this function everytime the window is resized so that the render target is a quarter
+	// the client area dimensions.  So Release the previous views before we create new ones.
+	ReleaseCOM(m_OffscreenRTV);
+	ReleaseCOM(m_OffscreenSRV);
+	ReleaseCOM(m_OffscreenUAV);
+
+	D3D11_TEXTURE2D_DESC texDesc;
+	texDesc.ArraySize = 1;
+	texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+	texDesc.CPUAccessFlags = 0;
+	texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	texDesc.Width = client_width_;
+	texDesc.Height = client_height_;
+	texDesc.MipLevels = 1;
+	texDesc.MiscFlags = 0;
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
+	texDesc.Usage = D3D11_USAGE_DEFAULT;
+	
+	ID3D11Texture2D* offscreenTex = nullptr;
+	HR(d3d_device_->CreateTexture2D(&texDesc, nullptr, &offscreenTex));
+
+	// Null description means to create a view to all mipmap levels using 
+	// the format the texture was created with.
+	HR(d3d_device_->CreateRenderTargetView(offscreenTex, nullptr, &m_OffscreenRTV));
+	HR(d3d_device_->CreateShaderResourceView(offscreenTex, nullptr, &m_OffscreenSRV));
+	HR(d3d_device_->CreateUnorderedAccessView(offscreenTex, nullptr, &m_OffscreenUAV));
+
+	ReleaseCOM(offscreenTex);
 }
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)

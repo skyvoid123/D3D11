@@ -7,8 +7,6 @@ public:
 	BlurFilter();
 	~BlurFilter();
 
-	ID3D11ShaderResourceView* GetBlurredOutput();
-
 	// Generate Gaussian blur weights.
 	void SetGaussianWeights(float sigma);
 

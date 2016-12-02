@@ -13,26 +13,22 @@ BlurFilter::~BlurFilter()
 	ReleaseCOM(m_BlurredOutputTexUAV);
 }
 
-ID3D11ShaderResourceView* BlurFilter::GetBlurredOutput()
-{
-	return m_BlurredOutputTexSRV;
-}
 
 void BlurFilter::SetGaussianWeights(float sigma)
 {
 	float d = 2.f * sigma * sigma;
 	float weights[9];
 	float sum = 0.f;
-	for (int i = 0; i < 8; ++i)
+	for (int i = 0; i < 9; ++i)
 	{
 		float x = (float)i;
 		weights[i] = expf(-x * x / d);
 		
-		sum + weights[i];
+		sum += weights[i];
 	}
 
 	// Divide by the sum so all the weights add up to 1.0.
-	for (int i = 0; i < 8; ++i)
+	for (int i = 0; i < 9; ++i)
 	{
 		weights[i] /= sum;
 	}
@@ -97,7 +93,6 @@ void BlurFilter::BlurInPlace(ID3D11DeviceContext* dc, ID3D11ShaderResourceView* 
 	//
 	// Run the compute shader to blur the offscreen texture.
 	// 
-
 	for (int i = 0; i < blurCount; ++i)
 	{
 		// HORIZONTAL blur pass.
