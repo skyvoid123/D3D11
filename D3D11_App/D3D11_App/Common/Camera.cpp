@@ -1,10 +1,10 @@
 #include "Camera.h"
 
 Camera::Camera()
-	: m_Position(0.f, 0.f, 0.f)
+	: m_Position(0.f, 5.f, -5.f)
 	, m_Right(1.f, 0.f, 0.f)
 	, m_Up(0.f, 1.f, 0.f)
-	, m_Look(0.f, 0.f, 1.f)
+	, m_Look(0.f, -1.f, 1.f)
 {
 	SetLens(0.25f * MathHelper::Pi, 1.0, 1.f, 1000.f);
 }

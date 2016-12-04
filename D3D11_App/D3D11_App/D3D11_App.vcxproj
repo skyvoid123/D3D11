@@ -145,10 +145,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Chapter11_ComputeShader\BlurFilter.h" />
-    <ClInclude Include="Chapter11_ComputeShader\Effects.h" />
-    <ClInclude Include="Chapter11_ComputeShader\RenderStates.h" />
-    <ClInclude Include="Chapter11_ComputeShader\Vertex.h" />
+    <ClInclude Include="Chapter12_TessellationStages\Effects.h" />
+    <ClInclude Include="Chapter12_TessellationStages\RenderStates.h" />
+    <ClInclude Include="Chapter12_TessellationStages\Vertex.h" />
     <ClInclude Include="Common\Camera.h" />
     <ClInclude Include="Common\DDSTextureLoader.h" />
     <ClInclude Include="Common\LightHelper.h" />
@@ -162,11 +161,10 @@
     <ClInclude Include="Common\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Chapter11_ComputeShader\Blur.cpp" />
-    <ClCompile Include="Chapter11_ComputeShader\BlurFilter.cpp" />
-    <ClCompile Include="Chapter11_ComputeShader\Effects.cpp" />
-    <ClCompile Include="Chapter11_ComputeShader\RenderStates.cpp" />
-    <ClCompile Include="Chapter11_ComputeShader\Vertex.cpp" />
+    <ClCompile Include="Chapter12_TessellationStages\BezierPatch\BezierPatch.cpp" />
+    <ClCompile Include="Chapter12_TessellationStages\Effects.cpp" />
+    <ClCompile Include="Chapter12_TessellationStages\RenderStates.cpp" />
+    <ClCompile Include="Chapter12_TessellationStages\Vertex.cpp" />
     <ClCompile Include="Common\Camera.cpp" />
     <ClCompile Include="Common\DDSTextureLoader.cpp" />
     <ClCompile Include="Common\Waves.cpp" />
@@ -211,6 +209,13 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="FX\Blur.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="FX\Tessellation.fx">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
