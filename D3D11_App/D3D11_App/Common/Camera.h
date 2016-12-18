@@ -2,6 +2,42 @@
 
 #include "d3dUtil.h"
 
+struct Plane
+{
+	XMFLOAT4 p;
+
+	Plane()
+		: p(0, 0, 0, 0)
+	{
+
+	}
+
+	Plane(XMVECTOR v)
+	{
+		XMStoreFloat4(&p, v);
+	}
+
+	Plane(float a, float b, float c, float d)
+		: p(a, b, c, d)
+	{
+		
+	}
+};
+
+struct Frustum
+{
+	Plane m_Planes[6];
+
+	Frustum()
+	{
+
+	}
+
+	bool IsPointInFrustum(FXMVECTOR v) const;
+
+	bool IsIntersected(const Box& box) const;
+};
+
 class Camera
 {
 public:
@@ -35,6 +71,8 @@ public:
 	float GetFarWindowWidth() const;
 	float GetFarWindowHeight() const;
 
+	const Frustum& GetFrustum() const;
+
 	// Set frustum.
 	void SetLens(float fovY, float aspect, float zn, float zf);
 
@@ -58,6 +96,8 @@ public:
 	// After modifying camera position/orientation, call to rebuild the view matrix.
 	void UpdateViewMatrix();
 
+	void CalLocalFrustum(FXMMATRIX world);
+
 private:
 	// Camera coordinate system with coordinates relative to world space.
 	XMFLOAT3 m_Position;
@@ -76,4 +116,7 @@ private:
 	// Cache View/Proj matrices.
 	XMFLOAT4X4 m_View;
 	XMFLOAT4X4 m_Proj;
+
+	// In the world space
+	Frustum m_Frustum;
 };

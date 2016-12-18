@@ -66,3 +66,36 @@ namespace Colors
 	XMGLOBALCONST XMVECTORF32 Silver = { 0.75f, 0.75f, 0.75f, 1.0f };
 	XMGLOBALCONST XMVECTORF32 LightSteelBlue = { 0.69f, 0.77f, 0.87f, 1.0f };
 }
+
+struct Box
+{
+	XMFLOAT3 center;
+	XMFLOAT3 extent;
+
+	Box()
+		: center(0, 0, 0)
+		, extent(0, 0, 0)
+	{
+
+	}
+
+	Box(const XMFLOAT3& c, const XMFLOAT3& e)
+		: center(c)
+		, extent(e)
+	{
+	}
+
+	XMVECTOR GetMinV() const
+	{
+		XMVECTOR c = XMLoadFloat3(&center);
+		XMVECTOR e = XMLoadFloat3(&extent);
+		return c - e;
+	}
+
+	XMVECTOR GetMaxV() const
+	{
+		XMVECTOR c = XMLoadFloat3(&center);
+		XMVECTOR e = XMLoadFloat3(&extent);
+		return c + e;
+	}
+};
