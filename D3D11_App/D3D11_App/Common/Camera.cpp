@@ -17,7 +17,7 @@ bool Frustum::IsPointInFrustum(FXMVECTOR v) const
 
 bool Frustum::IsIntersected(const Box& box) const
 {
-	XMFLOAT4 v[8];
+	/*XMFLOAT4 v[8];
 
 	XMFLOAT3 maxV;
 	XMFLOAT3 minV;
@@ -42,9 +42,9 @@ bool Frustum::IsIntersected(const Box& box) const
 			return true;
 		}
 	}
-	return false;
+	return false;*/
 
-	/*for (int i = 0; i < 6; ++i)
+	for (int i = 0; i < 6; ++i)
 	{
 		XMFLOAT4 v;
 
@@ -87,14 +87,14 @@ bool Frustum::IsIntersected(const Box& box) const
 		}
 	}
 
-	return true;*/
+	return true;
 }
 
 Camera::Camera()
-	: m_Position(0.f, 0.f, -0.f)
+	: m_Position(0.f, 5.f, -5.f)
 	, m_Right(1.f, 0.f, 0.f)
 	, m_Up(0.f, 1.f, 0.f)
-	, m_Look(0.f, 0.f, 1.f)
+	, m_Look(0.f, -1.f, 1.f)
 {
 	SetLens(0.25f * MathHelper::Pi, 1.0, 1.f, 1000.f);
 }
@@ -348,7 +348,7 @@ void Camera::CalLocalFrustum(FXMMATRIX world)
 	};
 	XMVECTOR Determinant;
 	XMMATRIX wvp = XMMatrixMultiply(world, ViewProj());
-	XMMATRIX matInverse = XMMatrixInverse(&Determinant, Proj());
+	XMMATRIX matInverse = XMMatrixInverse(&Determinant, wvp);
 	// Compute the frustum corners in world space.
 	XMVECTOR Points[6];
 	for (int i = 0; i < 6; i++)

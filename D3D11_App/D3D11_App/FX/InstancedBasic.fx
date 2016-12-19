@@ -54,7 +54,7 @@ VertexOut VS(VertexIn vin)
 {
     VertexOut vout;
 
-    vout.PosW = mul(float4(vin.PosL, 1.f), vin.World).xzy;
+    vout.PosW = mul(float4(vin.PosL, 1.f), vin.World).xyz;
     
     vout.NormalW = mul(vin.NormalL, (float3x3) vin.World);
 

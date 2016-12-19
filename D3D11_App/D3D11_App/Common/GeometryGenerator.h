@@ -33,6 +33,8 @@ public:
 	/// Creates a box centered at the origin with the given dimensions.
 	void CreateBox(float width, float height, float depth, MeshData& meshData);
 
+	void CreateBox(const XMFLOAT3& center, float width, float height, float depth, MeshData& meshData);
+
 	/// Creates a sphere centered at the origin with the given radius.  The
 	/// slices and stacks parameters control the degree of tessellation.
 	void CreateSphere(float radius, UINT sliceCount, UINT stackCount, MeshData& meshData);

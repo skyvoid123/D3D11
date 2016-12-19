@@ -22,6 +22,11 @@ struct Plane
 	{
 		
 	}
+
+	operator XMVECTOR() const
+	{
+		return XMLoadFloat4(&p);
+	}
 };
 
 struct Frustum

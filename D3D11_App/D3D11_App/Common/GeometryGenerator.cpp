@@ -75,6 +75,80 @@ void GeometryGenerator::CreateBox(float width, float height, float depth, MeshDa
 	meshData.Indices.assign(&i[0], &i[36]);
 }
 
+void GeometryGenerator::CreateBox(const XMFLOAT3& center, float width, float height, float depth, MeshData& meshData)
+{
+	// Create Vertex
+	Vertex v[24];
+	//std::vector<Vertex>v;
+	//v.resize(24);
+
+	float w2 = 0.5f * width;
+	float h2 = 0.5f * height;
+	float d2 = 0.5f * depth;
+
+	// Fill in the front face vertex data.
+	v[0] = { center.x - w2, center.y - h2, center.z - d2, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+	v[1] = { center.x - w2, center.y + h2, center.z - d2, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+	v[2] = { center.x + w2, center.y + h2, center.z - d2, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f };
+	v[3] = { center.x + w2, center.y - h2, center.z - d2, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
+
+	// Fill in the back face vertex data.
+	v[4] = { center.x - w2, center.y - h2, center.z + d2, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
+	v[5] = { center.x + w2, center.y - h2, center.z + d2, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+	v[6] = { center.x + w2, center.y + h2, center.z + d2, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+	v[7] = { center.x - w2, center.y + h2, center.z + d2, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f };
+
+	// Fill in the top face vertex data.
+	v[8] = { center.x - w2, center.y + h2, center.z - d2, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+	v[9] = { center.x - w2, center.y + h2, center.z + d2, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+	v[10] = { center.x + w2, center.y + h2, center.z + d2, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f };
+	v[11] = { center.x + w2, center.y + h2, center.z - d2, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
+
+	// Fill in the bottom face vertex data.
+	v[12] = { center.x - w2, center.y - h2, center.z - d2, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f };
+	v[13] = { center.x + w2, center.y - h2, center.z - d2, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+	v[14] = { center.x + w2, center.y - h2, center.z + d2, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+	v[15] = { center.x - w2, center.y - h2, center.z + d2, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f };
+
+	// Fill in the left face vertex data.
+	v[16] = { center.x - w2, center.y - h2, center.z + d2, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f };
+	v[17] = { center.x - w2, center.y + h2, center.z + d2, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f };
+	v[18] = { center.x - w2, center.y + h2, center.z - d2, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f };
+	v[19] = { center.x - w2, center.y - h2, center.z - d2, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f };
+
+	// Fill in the right face vertex data.
+	v[20] = { center.x + w2, center.y - h2, center.z - d2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f };
+	v[21] = { center.x + w2, center.y + h2, center.z - d2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f };
+	v[22] = { center.x + w2, center.y + h2, center.z + d2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f };
+	v[23] = { center.x + w2, center.y - h2, center.z + d2, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f };
+
+	meshData.Vertices.assign(&v[0], &v[24]);
+
+	// Create the indices.
+	UINT i[36] = {
+		// front face
+		0, 1, 2,
+		0, 2, 3,
+		// back face
+		4, 5, 6,
+		4, 6, 7,
+		// top face
+		8, 9, 10,
+		8, 10, 11,
+		// bottom face
+		12, 13, 14,
+		12, 14, 15,
+		// left face
+		16, 17, 18,
+		16, 18, 19,
+		// right face
+		20, 21, 22,
+		20, 22, 23
+	};
+
+	meshData.Indices.assign(&i[0], &i[36]);
+}
+
 void GeometryGenerator::CreateSphere(float radius, UINT sliceCount, UINT stackCount, MeshData& meshData)
 {
 	meshData.Vertices.clear();

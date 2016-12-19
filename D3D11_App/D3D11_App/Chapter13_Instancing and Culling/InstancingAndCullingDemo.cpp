@@ -37,11 +37,16 @@ private:
 	void BuildSkullGeometryBuffers();
 	void BuildInstancedBuffer();
 
+	void DrawLocalAABB(const Box& box);
+
 private:
 	ID3D11Buffer* m_SkullVB;
 	ID3D11Buffer* m_SkullIB;
 
 	ID3D11Buffer* m_InstancedBuffer;
+
+	ID3D11Buffer* m_BoxVB;
+	ID3D11Buffer* m_BoxIB;
 
 	// Bounding box of the skull.
 	Box m_SkullBox;
@@ -115,6 +120,7 @@ bool InstancingAndCullingApp::Init()
 
 	Effects::InitAll(d3d_device_);
 	InputLayouts::InitAll(d3d_device_);
+	RenderStates::InitAll(d3d_device_);
 
 	BuildSkullGeometryBuffers();
 	BuildInstancedBuffer();
@@ -172,7 +178,6 @@ void InstancingAndCullingApp::UpdateScene(float dt)
 			if (m_Camera.GetFrustum().IsIntersected(m_SkullBox))
 			{
 				data[m_VisibleObjectCount++] = m_InstancedData[i];
-				m_InstancedData[i].Color = XMFLOAT4(1.f, 0.f, 0.f, 1.f);
 			}
 		}
 	}
@@ -203,7 +208,7 @@ void InstancingAndCullingApp::DrawScene()
 	d3d_context_->IASetInputLayout(InputLayouts::InstancedBasic32);
 	d3d_context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	XMMATRIX viewProj =m_Camera.ViewProj();
+	XMMATRIX viewProj = m_Camera.ViewProj();
 
 	UINT stride[2] = { sizeof(Vertex::Basic32), sizeof(InstanceData) };
 	UINT offset[2] = { 0, 0 };
@@ -223,6 +228,9 @@ void InstancingAndCullingApp::DrawScene()
 		d3d_context_->IASetVertexBuffers(0, 2, vbs, stride, offset);
 		d3d_context_->IASetIndexBuffer(m_SkullIB, DXGI_FORMAT_R32_UINT, 0);
 
+		XMMATRIX world = XMLoadFloat4x4(&m_InstancedData[0].World);
+		XMMATRIX invWorld = MathHelper::InverseTranspose(world);
+
 		Effects::InstancedBasicFX->SetViewProj(viewProj);
 		Effects::InstancedBasicFX->SetTexTransform(XMMatrixIdentity());
 		Effects::InstancedBasicFX->SetMaterial(m_SkullMat);
@@ -230,6 +238,9 @@ void InstancingAndCullingApp::DrawScene()
 		tech->GetPassByIndex(p)->Apply(0, d3d_context_);
 		d3d_context_->DrawIndexedInstanced(m_SkullIndexCount, m_VisibleObjectCount, 0, 0, 0);
 	}
+
+	// Draw Bounding Box
+	DrawLocalAABB(m_SkullBox);
 
 	HR(swap_chain_->Present(0, 0));
 }
@@ -337,6 +348,47 @@ void InstancingAndCullingApp::BuildSkullGeometryBuffers()
 	D3D11_SUBRESOURCE_DATA iinitData;
 	iinitData.pSysMem = &indices[0];
 	HR(d3d_device_->CreateBuffer(&ibd, &iinitData, &m_SkullIB));
+
+	//
+	// Create Local Box Buffer
+	//
+
+	GeometryGenerator::MeshData box;
+
+	GeometryGenerator geoGen;
+	geoGen.CreateBox(m_SkullBox.center, m_SkullBox.extent.x * 2.f, m_SkullBox.extent.y * 2.f, m_SkullBox.extent.z * 2.f, box);
+
+	std::vector<Vertex::Basic32> v(box.Vertices.size());
+	for (UINT i = 0; i < v.size(); ++i)
+	{
+		v[i].Pos = box.Vertices[i].Position;
+		v[i].Normal = box.Vertices[i].Normal;
+		v[i].Tex = box.Vertices[i].TexC;
+	}
+
+	D3D11_BUFFER_DESC bvbd;
+	bvbd.Usage = D3D11_USAGE_IMMUTABLE;
+	bvbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bvbd.ByteWidth = sizeof(Vertex::Basic32) * v.size();
+	bvbd.CPUAccessFlags = 0;
+	bvbd.MiscFlags = 0;
+	D3D11_SUBRESOURCE_DATA vData;
+	vData.pSysMem = &v[0];
+	HR(d3d_device_->CreateBuffer(&bvbd, &vData, &m_BoxVB));
+
+	//
+	// Pack the indices of all the meshes into one index buffer.
+	//
+
+	D3D11_BUFFER_DESC bibd;
+	bibd.Usage = D3D11_USAGE_IMMUTABLE;
+	bibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	bibd.ByteWidth = sizeof(UINT) * box.Indices.size();
+	bibd.CPUAccessFlags = 0;
+	bibd.MiscFlags = 0;
+	D3D11_SUBRESOURCE_DATA iData;
+	iData.pSysMem = &box.Indices[0];
+	HR(d3d_device_->CreateBuffer(&bibd, &iData, &m_BoxIB));
 }
 
 void InstancingAndCullingApp::BuildInstancedBuffer()
@@ -385,6 +437,46 @@ void InstancingAndCullingApp::BuildInstancedBuffer()
 	vbd.StructureByteStride = 0;
 
 	HR(d3d_device_->CreateBuffer(&vbd, nullptr, &m_InstancedBuffer));
+}
+
+void InstancingAndCullingApp::DrawLocalAABB(const Box& box)
+{
+	d3d_context_->IASetInputLayout(InputLayouts::Basic32);
+	
+	XMMATRIX viewProj = m_Camera.ViewProj();
+
+	UINT stride = sizeof(Vertex::Basic32);
+	UINT offset = 0;
+
+	ID3DX11EffectTechnique* boxTech = Effects::BasicFX->Light0TexTech;
+
+	D3DX11_TECHNIQUE_DESC techDesc;
+	boxTech->GetDesc(&techDesc);
+	for (int i = 0; i < m_InstancedData.size(); ++i)
+	{
+		for (int p = 0; p < techDesc.Passes; ++p)
+		{
+			d3d_context_->IASetVertexBuffers(0, 1, &m_BoxVB, &stride, &offset);
+			d3d_context_->IASetIndexBuffer(m_BoxIB, DXGI_FORMAT_R32_UINT, 0);
+
+			// Set per object constants.
+			auto world = XMLoadFloat4x4(&m_InstancedData[i].World);
+			auto worldInvTranspose = MathHelper::InverseTranspose(world);
+			auto wvp = world * viewProj;
+
+			Effects::BasicFX->SetWorld(world);
+			Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
+			Effects::BasicFX->SetWorldViewProj(wvp);
+			Effects::BasicFX->SetTexTransform(XMMatrixIdentity());
+
+			d3d_context_->RSSetState(RenderStates::WireframeRS);
+			boxTech->GetPassByIndex(p)->Apply(0, d3d_context_);
+			d3d_context_->DrawIndexed(36, 0, 0);
+
+			d3d_context_->RSSetState(nullptr);
+		}
+	}
+	
 }
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
