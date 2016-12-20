@@ -145,9 +145,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Chapter13_Instancing and Culling\Effects.h" />
-    <ClInclude Include="Chapter13_Instancing and Culling\RenderStates.h" />
-    <ClInclude Include="Chapter13_Instancing and Culling\Vertex.h" />
+    <ClInclude Include="Chapter14_Picking\Effects.h" />
+    <ClInclude Include="Chapter14_Picking\RenderStates.h" />
+    <ClInclude Include="Chapter14_Picking\Vertex.h" />
     <ClInclude Include="Common\Camera.h" />
     <ClInclude Include="Common\DDSTextureLoader.h" />
     <ClInclude Include="Common\LightHelper.h" />
@@ -161,11 +161,12 @@
     <ClInclude Include="Common\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Chapter13_Instancing and Culling\Effects.cpp" />
-    <ClCompile Include="Chapter13_Instancing and Culling\InstancingAndCullingDemo.cpp" />
-    <ClCompile Include="Chapter13_Instancing and Culling\RenderStates.cpp" />
-    <ClCompile Include="Chapter13_Instancing and Culling\Vertex.cpp" />
+    <ClCompile Include="Chapter14_Picking\Effects.cpp" />
+    <ClCompile Include="Chapter14_Picking\PickingDemo.cpp" />
+    <ClCompile Include="Chapter14_Picking\RenderStates.cpp" />
+    <ClCompile Include="Chapter14_Picking\Vertex.cpp" />
     <ClCompile Include="Common\Camera.cpp" />
+    <ClCompile Include="Common\d3dUtil.cpp" />
     <ClCompile Include="Common\DDSTextureLoader.cpp" />
     <ClCompile Include="Common\Waves.cpp" />
     <ClCompile Include="Common\d3dApp.cpp" />

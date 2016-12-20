@@ -99,3 +99,24 @@ struct Box
 		return c + e;
 	}
 };
+
+struct Ray
+{
+	XMFLOAT3 origin;
+	XMFLOAT3 direction;
+
+	Ray(const XMFLOAT3& o, const XMFLOAT3& d)
+		: origin(o)
+		, direction(d)
+	{
+	}
+
+	Ray(FXMVECTOR o, CXMVECTOR d)
+	{
+		XMStoreFloat3(&origin, o);
+		XMStoreFloat3(&direction, d);
+	}
+
+	bool IsIntersectBox(const Box& box, float* pDist);
+	bool IsIntersectTriangle(FXMVECTOR v0, CXMVECTOR v1, CXMVECTOR v2, float* pDist);
+};
