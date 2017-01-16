@@ -1,37 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Common\DDSTextureLoader.cpp" />
-    <ClCompile Include="Common\Waves.cpp" />
-    <ClCompile Include="Common\d3dApp.cpp" />
-    <ClCompile Include="Common\dxerr.cpp" />
-    <ClCompile Include="Common\GameTimer.cpp" />
-    <ClCompile Include="Common\GeometryGenerator.cpp" />
-    <ClCompile Include="Common\MathHelper.cpp" />
-    <ClCompile Include="Common\Camera.cpp" />
-    <ClCompile Include="Common\d3dUtil.cpp" />
     <ClCompile Include="Chapter15_CubeMap\Effects.cpp" />
     <ClCompile Include="Chapter15_CubeMap\RenderStates.cpp" />
     <ClCompile Include="Chapter15_CubeMap\Vertex.cpp" />
     <ClCompile Include="Chapter15_CubeMap\Sky.cpp" />
-    <ClCompile Include="Chapter15_CubeMap\CubeMapDemo.cpp" />
+    <ClCompile Include="Common\Camera.cpp" />
+    <ClCompile Include="Common\d3dApp.cpp" />
+    <ClCompile Include="Common\d3dUtil.cpp" />
+    <ClCompile Include="Common\DDSTextureLoader.cpp" />
+    <ClCompile Include="Common\dxerr.cpp" />
+    <ClCompile Include="Common\GameTimer.cpp" />
+    <ClCompile Include="Common\GeometryGenerator.cpp" />
+    <ClCompile Include="Common\MathHelper.cpp" />
+    <ClCompile Include="Common\Waves.cpp" />
+    <ClCompile Include="Chapter15_CubeMap\DynamicCubeMapDemo.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Common\DDSTextureLoader.h" />
-    <ClInclude Include="Common\LightHelper.h" />
-    <ClInclude Include="Common\Waves.h" />
-    <ClInclude Include="Common\d3dApp.h" />
-    <ClInclude Include="Common\d3dUtil.h" />
-    <ClInclude Include="Common\d3dx11effect.h" />
-    <ClInclude Include="Common\dxerr.h" />
-    <ClInclude Include="Common\GameTimer.h" />
-    <ClInclude Include="Common\GeometryGenerator.h" />
-    <ClInclude Include="Common\MathHelper.h" />
-    <ClInclude Include="Common\Camera.h" />
     <ClInclude Include="Chapter15_CubeMap\Effects.h" />
     <ClInclude Include="Chapter15_CubeMap\RenderStates.h" />
     <ClInclude Include="Chapter15_CubeMap\Vertex.h" />
     <ClInclude Include="Chapter15_CubeMap\Sky.h" />
+    <ClInclude Include="Common\Camera.h" />
+    <ClInclude Include="Common\d3dApp.h" />
+    <ClInclude Include="Common\d3dUtil.h" />
+    <ClInclude Include="Common\d3dx11effect.h" />
+    <ClInclude Include="Common\DDSTextureLoader.h" />
+    <ClInclude Include="Common\dxerr.h" />
+    <ClInclude Include="Common\GameTimer.h" />
+    <ClInclude Include="Common\GeometryGenerator.h" />
+    <ClInclude Include="Common\LightHelper.h" />
+    <ClInclude Include="Common\MathHelper.h" />
+    <ClInclude Include="Common\Waves.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="FX\color.fx" />

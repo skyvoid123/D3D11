@@ -162,9 +162,9 @@
     <ClInclude Include="Common\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Chapter15_CubeMap\DynamicCubeMapDemo.cpp" />
     <ClCompile Include="Chapter15_CubeMap\Effects.cpp" />
     <ClCompile Include="Chapter15_CubeMap\RenderStates.cpp" />
-    <ClCompile Include="Chapter15_CubeMap\CubeMapDemo.cpp" />
     <ClCompile Include="Chapter15_CubeMap\Vertex.cpp" />
     <ClCompile Include="Common\Camera.cpp" />
     <ClCompile Include="Common\d3dUtil.cpp" />
