@@ -145,13 +145,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Chapter15_CubeMap\Effects.h" />
-    <ClInclude Include="Chapter15_CubeMap\RenderStates.h" />
-    <ClInclude Include="Chapter15_CubeMap\Vertex.h" />
+    <ClInclude Include="Chapter16_Normal and Displacement Mapping\Effects.h" />
+    <ClInclude Include="Chapter16_Normal and Displacement Mapping\RenderStates.h" />
+    <ClInclude Include="Chapter16_Normal and Displacement Mapping\Sky.h" />
+    <ClInclude Include="Chapter16_Normal and Displacement Mapping\Vertex.h" />
     <ClInclude Include="Common\Camera.h" />
     <ClInclude Include="Common\DDSTextureLoader.h" />
     <ClInclude Include="Common\LightHelper.h" />
-    <ClInclude Include="Chapter15_CubeMap\Sky.h" />
     <ClInclude Include="Common\Waves.h" />
     <ClInclude Include="Common\d3dApp.h" />
     <ClInclude Include="Common\d3dUtil.h" />
@@ -162,14 +162,14 @@
     <ClInclude Include="Common\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Chapter15_CubeMap\DynamicCubeMapDemo.cpp" />
-    <ClCompile Include="Chapter15_CubeMap\Effects.cpp" />
-    <ClCompile Include="Chapter15_CubeMap\RenderStates.cpp" />
-    <ClCompile Include="Chapter15_CubeMap\Vertex.cpp" />
+    <ClCompile Include="Chapter16_Normal and Displacement Mapping\NormalDisplacementMapDemo.cpp" />
+    <ClCompile Include="Chapter16_Normal and Displacement Mapping\Effects.cpp" />
+    <ClCompile Include="Chapter16_Normal and Displacement Mapping\RenderStates.cpp" />
+    <ClCompile Include="Chapter16_Normal and Displacement Mapping\Sky.cpp" />
+    <ClCompile Include="Chapter16_Normal and Displacement Mapping\Vertex.cpp" />
     <ClCompile Include="Common\Camera.cpp" />
     <ClCompile Include="Common\d3dUtil.cpp" />
     <ClCompile Include="Common\DDSTextureLoader.cpp" />
-    <ClCompile Include="Chapter15_CubeMap\Sky.cpp" />
     <ClCompile Include="Common\Waves.cpp" />
     <ClCompile Include="Common\d3dApp.cpp" />
     <ClCompile Include="Common\dxerr.cpp" />
@@ -233,6 +233,20 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="FX\Sky.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="FX\NormalMap.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="FX\DisplacementMap.fx">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>

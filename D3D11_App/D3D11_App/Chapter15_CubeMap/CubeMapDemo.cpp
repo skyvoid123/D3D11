@@ -164,6 +164,11 @@ CubeMapApp::~CubeMapApp()
 	ReleaseCOM(m_FloorTexSRV);
 	ReleaseCOM(m_StoneTexSRV);
 	ReleaseCOM(m_BrickTexSRV);
+	
+	for (int i = 0; i < 3; ++i)
+	{
+		delete m_Skys[i];
+	}
 
 	Effects::DestroyAll();
 	InputLayouts::DestroyAll();

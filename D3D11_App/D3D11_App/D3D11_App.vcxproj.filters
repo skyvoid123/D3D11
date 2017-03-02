@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Chapter15_CubeMap\Effects.cpp" />
-    <ClCompile Include="Chapter15_CubeMap\RenderStates.cpp" />
-    <ClCompile Include="Chapter15_CubeMap\Vertex.cpp" />
-    <ClCompile Include="Chapter15_CubeMap\Sky.cpp" />
     <ClCompile Include="Common\Camera.cpp" />
     <ClCompile Include="Common\d3dApp.cpp" />
     <ClCompile Include="Common\d3dUtil.cpp" />
@@ -14,13 +10,13 @@
     <ClCompile Include="Common\GeometryGenerator.cpp" />
     <ClCompile Include="Common\MathHelper.cpp" />
     <ClCompile Include="Common\Waves.cpp" />
-    <ClCompile Include="Chapter15_CubeMap\DynamicCubeMapDemo.cpp" />
+    <ClCompile Include="Chapter16_Normal and Displacement Mapping\Effects.cpp" />
+    <ClCompile Include="Chapter16_Normal and Displacement Mapping\RenderStates.cpp" />
+    <ClCompile Include="Chapter16_Normal and Displacement Mapping\Sky.cpp" />
+    <ClCompile Include="Chapter16_Normal and Displacement Mapping\Vertex.cpp" />
+    <ClCompile Include="Chapter16_Normal and Displacement Mapping\NormalDisplacementMapDemo.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Chapter15_CubeMap\Effects.h" />
-    <ClInclude Include="Chapter15_CubeMap\RenderStates.h" />
-    <ClInclude Include="Chapter15_CubeMap\Vertex.h" />
-    <ClInclude Include="Chapter15_CubeMap\Sky.h" />
     <ClInclude Include="Common\Camera.h" />
     <ClInclude Include="Common\d3dApp.h" />
     <ClInclude Include="Common\d3dUtil.h" />
@@ -32,6 +28,10 @@
     <ClInclude Include="Common\LightHelper.h" />
     <ClInclude Include="Common\MathHelper.h" />
     <ClInclude Include="Common\Waves.h" />
+    <ClInclude Include="Chapter16_Normal and Displacement Mapping\Effects.h" />
+    <ClInclude Include="Chapter16_Normal and Displacement Mapping\RenderStates.h" />
+    <ClInclude Include="Chapter16_Normal and Displacement Mapping\Sky.h" />
+    <ClInclude Include="Chapter16_Normal and Displacement Mapping\Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="FX\color.fx" />
@@ -43,5 +43,7 @@
     <CustomBuild Include="FX\Tessellation.fx" />
     <CustomBuild Include="FX\InstancedBasic.fx" />
     <CustomBuild Include="FX\Sky.fx" />
+    <CustomBuild Include="FX\NormalMap.fx" />
+    <CustomBuild Include="FX\DisplacementMap.fx" />
   </ItemGroup>
 </Project>
