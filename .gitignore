@@ -7,7 +7,6 @@ D3D11_App/D3D11_App/FX/color.cod
 *.obj
 *.idb
 *.pdb
-*.exe
 *.ilk
 *.sdf
 *.opendb
