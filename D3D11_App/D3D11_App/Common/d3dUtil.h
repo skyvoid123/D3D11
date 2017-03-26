@@ -120,3 +120,5 @@ struct Ray
 	bool IsIntersectBox(const Box& box, float* pDist);
 	bool IsIntersectTriangle(FXMVECTOR v0, CXMVECTOR v1, CXMVECTOR v2, float* pDist);
 };
+
+void ExtractFrustumPlanes(XMFLOAT4 planes[6], CXMMATRIX M);

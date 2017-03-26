@@ -145,10 +145,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Chapter16_Normal and Displacement Mapping\Effects.h" />
-    <ClInclude Include="Chapter16_Normal and Displacement Mapping\RenderStates.h" />
-    <ClInclude Include="Chapter16_Normal and Displacement Mapping\Sky.h" />
-    <ClInclude Include="Chapter16_Normal and Displacement Mapping\Vertex.h" />
+    <ClInclude Include="Chapter17_Terrain Rendering\Effects.h" />
+    <ClInclude Include="Chapter17_Terrain Rendering\RenderStates.h" />
+    <ClInclude Include="Chapter17_Terrain Rendering\Sky.h" />
+    <ClInclude Include="Chapter17_Terrain Rendering\Terrain.h" />
+    <ClInclude Include="Chapter17_Terrain Rendering\Vertex.h" />
     <ClInclude Include="Common\Camera.h" />
     <ClInclude Include="Common\DDSTextureLoader.h" />
     <ClInclude Include="Common\LightHelper.h" />
@@ -162,11 +163,12 @@
     <ClInclude Include="Common\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Chapter16_Normal and Displacement Mapping\NormalDisplacementMapDemo.cpp" />
-    <ClCompile Include="Chapter16_Normal and Displacement Mapping\Effects.cpp" />
-    <ClCompile Include="Chapter16_Normal and Displacement Mapping\RenderStates.cpp" />
-    <ClCompile Include="Chapter16_Normal and Displacement Mapping\Sky.cpp" />
-    <ClCompile Include="Chapter16_Normal and Displacement Mapping\Vertex.cpp" />
+    <ClCompile Include="Chapter17_Terrain Rendering\Effects.cpp" />
+    <ClCompile Include="Chapter17_Terrain Rendering\RenderStates.cpp" />
+    <ClCompile Include="Chapter17_Terrain Rendering\Sky.cpp" />
+    <ClCompile Include="Chapter17_Terrain Rendering\Terrain.cpp" />
+    <ClCompile Include="Chapter17_Terrain Rendering\TerrainDemo.cpp" />
+    <ClCompile Include="Chapter17_Terrain Rendering\Vertex.cpp" />
     <ClCompile Include="Common\Camera.cpp" />
     <ClCompile Include="Common\d3dUtil.cpp" />
     <ClCompile Include="Common\DDSTextureLoader.cpp" />
@@ -247,6 +249,13 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="FX\DisplacementMap.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="FX\Terrain.fx">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
