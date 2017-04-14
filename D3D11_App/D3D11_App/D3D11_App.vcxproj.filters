@@ -10,12 +10,13 @@
     <ClCompile Include="Common\GeometryGenerator.cpp" />
     <ClCompile Include="Common\MathHelper.cpp" />
     <ClCompile Include="Common\Waves.cpp" />
-    <ClCompile Include="Chapter17_Terrain Rendering\Effects.cpp" />
-    <ClCompile Include="Chapter17_Terrain Rendering\RenderStates.cpp" />
-    <ClCompile Include="Chapter17_Terrain Rendering\Sky.cpp" />
-    <ClCompile Include="Chapter17_Terrain Rendering\Terrain.cpp" />
-    <ClCompile Include="Chapter17_Terrain Rendering\TerrainDemo.cpp" />
-    <ClCompile Include="Chapter17_Terrain Rendering\Vertex.cpp" />
+    <ClCompile Include="Chapter18_Particle System\Effects.cpp" />
+    <ClCompile Include="Chapter18_Particle System\RenderStates.cpp" />
+    <ClCompile Include="Chapter18_Particle System\Sky.cpp" />
+    <ClCompile Include="Chapter18_Particle System\Terrain.cpp" />
+    <ClCompile Include="Chapter18_Particle System\Vertex.cpp" />
+    <ClCompile Include="Chapter18_Particle System\ParticlesDemo.cpp" />
+    <ClCompile Include="Chapter18_Particle System\ParticleSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Camera.h" />
@@ -29,11 +30,12 @@
     <ClInclude Include="Common\LightHelper.h" />
     <ClInclude Include="Common\MathHelper.h" />
     <ClInclude Include="Common\Waves.h" />
-    <ClInclude Include="Chapter17_Terrain Rendering\Effects.h" />
-    <ClInclude Include="Chapter17_Terrain Rendering\RenderStates.h" />
-    <ClInclude Include="Chapter17_Terrain Rendering\Sky.h" />
-    <ClInclude Include="Chapter17_Terrain Rendering\Terrain.h" />
-    <ClInclude Include="Chapter17_Terrain Rendering\Vertex.h" />
+    <ClInclude Include="Chapter18_Particle System\Effects.h" />
+    <ClInclude Include="Chapter18_Particle System\RenderStates.h" />
+    <ClInclude Include="Chapter18_Particle System\Sky.h" />
+    <ClInclude Include="Chapter18_Particle System\Terrain.h" />
+    <ClInclude Include="Chapter18_Particle System\Vertex.h" />
+    <ClInclude Include="Chapter18_Particle System\ParticleSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="FX\color.fx" />
@@ -48,5 +50,7 @@
     <CustomBuild Include="FX\NormalMap.fx" />
     <CustomBuild Include="FX\DisplacementMap.fx" />
     <CustomBuild Include="FX\Terrain.fx" />
+    <CustomBuild Include="FX\Fire.fx" />
+    <CustomBuild Include="FX\Rain.fx" />
   </ItemGroup>
 </Project>

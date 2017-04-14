@@ -122,3 +122,9 @@ struct Ray
 };
 
 void ExtractFrustumPlanes(XMFLOAT4 planes[6], CXMMATRIX M);
+
+class D3DHelper
+{
+public:
+	static ID3D11ShaderResourceView* CreateRandomTexture1DSRV(ID3D11Device* device);
+};

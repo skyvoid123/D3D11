@@ -221,13 +221,14 @@ bool NormalDisplacementMapApp::Init()
 
 	HR(DirectX::CreateDDSTextureFromFile(d3d_device_,
 		L"Textures/floor_nmap.dds", &texRes, &m_FloorNormalTexSRV));
+	ReleaseCOM(texRes);
 
 	HR(DirectX::CreateDDSTextureFromFile(d3d_device_,
 		L"Textures/stones_nmap.dds", &texRes, &m_StoneNormalTexSRV));
-	
+	ReleaseCOM(texRes);
+
 	HR(DirectX::CreateDDSTextureFromFile(d3d_device_,
 		L"Textures/bricks_nmap.dds", &texRes, &m_BrickNormalTexSRV));
-	
 	ReleaseCOM(texRes);
 
 	BuildShapeGeometryBuffers();

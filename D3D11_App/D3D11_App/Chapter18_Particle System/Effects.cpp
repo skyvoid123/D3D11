@@ -346,6 +346,28 @@ TerrainEffect::~TerrainEffect()
 }
 #pragma endregion
 
+#pragma region ParticleEffect
+ParticleEffect::ParticleEffect(ID3D11Device* device, const std::wstring& filename)
+	: Effect(device, filename)
+{
+	StreamOutTech = mFx->GetTechniqueByName("StreamOutTech");
+	DrawTech = mFx->GetTechniqueByName("DrawTech");
+
+	ViewProj = mFx->GetVariableByName("gViewProj")->AsMatrix();
+	GameTime = mFx->GetVariableByName("gGameTime")->AsScalar();
+	TimeStep = mFx->GetVariableByName("gTimeStep")->AsScalar();
+	EyePosW = mFx->GetVariableByName("gEyePosW")->AsVector();
+	EmitPosW = mFx->GetVariableByName("gEmitPosW")->AsVector();
+	EmitDirW = mFx->GetVariableByName("gEmitDirW")->AsVector();
+	Tex = mFx->GetVariableByName("gTexture")->AsShaderResource();
+	RandomTex = mFx->GetVariableByName("gRandomTex")->AsShaderResource();
+}
+
+ParticleEffect::~ParticleEffect()
+{
+}
+#pragma endregion
+
 #pragma region Effects
 BasicEffect* Effects::BasicFX = nullptr;
 TreeSpriteEffect* Effects::TreeSpriteFX = nullptr;
@@ -353,6 +375,8 @@ SkyEffect* Effects::SkyFX = nullptr;
 NormalMapEffect* Effects::NormalMapFX = nullptr;
 DisplacementMapEffect* Effects::DisplacementMapFX = nullptr;
 TerrainEffect* Effects::TerrainFX = nullptr;
+ParticleEffect* Effects::FireFX = nullptr;
+ParticleEffect* Effects::RainFX = nullptr;
 
 void Effects::InitAll(ID3D11Device* device)
 {
@@ -362,6 +386,8 @@ void Effects::InitAll(ID3D11Device* device)
 	NormalMapFX = new NormalMapEffect(device, L"FX/NormalMap.fxo");
 	DisplacementMapFX = new DisplacementMapEffect(device, L"FX/DisplacementMap.fxo");
 	TerrainFX = new TerrainEffect(device, L"FX/Terrain.fxo");
+	FireFX = new ParticleEffect(device, L"FX/Fire.fxo");
+	RainFX = new ParticleEffect(device, L"FX/Rain.fxo");
 }
 
 void Effects::DestroyAll()
@@ -372,5 +398,7 @@ void Effects::DestroyAll()
 	SafeDelete(NormalMapFX);
 	SafeDelete(DisplacementMapFX);
 	SafeDelete(TerrainFX);
+	SafeDelete(FireFX);
+	SafeDelete(RainFX);
 }
 #pragma endregion

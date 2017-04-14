@@ -9,14 +9,14 @@
 #include "RenderStates.h"
 #include "Sky.h"
 #include "Terrain.h"
-
+#include "ParticleSystem.h"
 #include "Camera.h"
 
-class TerrainApp : public D3DApp
+class ParticlesApp : public D3DApp
 {
 public:
-	TerrainApp(HINSTANCE hInstance);
-	~TerrainApp();
+	ParticlesApp(HINSTANCE hInstance);
+	~ParticlesApp();
 
 	bool Init();
 	void OnResize();
@@ -32,6 +32,13 @@ private:
 	Sky* m_CurrentSky;
 
 	Terrain m_Terrain;
+	
+	ParticleSystem m_Fire;
+	ParticleSystem m_Rain;
+
+	ID3D11ShaderResourceView* m_FlareTexSRV;
+	ID3D11ShaderResourceView* m_RainTexSRV;
+	ID3D11ShaderResourceView* m_RandomTexSRV;
 
 	DirectionalLight m_DirLights[3];
 
@@ -42,12 +49,12 @@ private:
 	POINT m_LastMousePos;
 };
 
-TerrainApp::TerrainApp(HINSTANCE hInstance)
+ParticlesApp::ParticlesApp(HINSTANCE hInstance)
 	: D3DApp(hInstance)
 	, m_CurrentSky(nullptr)
 	, m_IsWalkCamMode(false)
 {
-	main_wnd_caption_ = L"Terrain Demo";
+	main_wnd_caption_ = L"Particles Demo";
 
 	m_DirLights[0].Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
 	m_DirLights[0].Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -65,7 +72,7 @@ TerrainApp::TerrainApp(HINSTANCE hInstance)
 	m_DirLights[2].Direction = XMFLOAT3(-0.57735f, -0.57735f, -0.57735f);
 }
 
-TerrainApp::~TerrainApp()
+ParticlesApp::~ParticlesApp()
 {
 	d3d_context_->ClearState();
 
@@ -79,7 +86,7 @@ TerrainApp::~TerrainApp()
 	RenderStates::DestroyAll();
 }
 
-bool TerrainApp::Init()
+bool ParticlesApp::Init()
 {
 	if (!D3DApp::Init())
 	{
@@ -106,17 +113,29 @@ bool TerrainApp::Init()
 
 	m_Terrain.Init(d3d_device_, d3d_context_, tii);
 
+	m_RandomTexSRV = D3DHelper::CreateRandomTexture1DSRV(d3d_device_);
+
+	ID3D11Resource* tex_res = nullptr;
+	HR(DirectX::CreateDDSTextureFromFile(d3d_device_, L"Textures/flare0.dds", &tex_res, &m_FlareTexSRV));
+	ReleaseCOM(tex_res);
+	m_Fire.Init(d3d_device_, Effects::FireFX, m_FlareTexSRV, m_RandomTexSRV, 500);
+	m_Fire.SetEmitPos(XMFLOAT3(0.0f, 1.0f, 120.0f));
+
+	HR(DirectX::CreateDDSTextureFromFile(d3d_device_, L"Textures/raindrop.dds", &tex_res, &m_RainTexSRV));
+	ReleaseCOM(tex_res);
+	m_Rain.Init(d3d_device_, Effects::RainFX, m_RainTexSRV, m_RandomTexSRV, 10000);
+
 	return true;
 }
 
-void TerrainApp::OnResize()
+void ParticlesApp::OnResize()
 {
 	D3DApp::OnResize();
 
-	m_Camera.SetLens(.25f * MathHelper::Pi, AspectRatio(), 1.f, 1000.f);
+	m_Camera.SetLens(.25f * MathHelper::Pi, AspectRatio(), 1.f, 3000.f);
 }
 
-void TerrainApp::UpdateScene(float dt)
+void ParticlesApp::UpdateScene(float dt)
 {
 	//
 	// Switch the sky based on key presses.
@@ -134,16 +153,16 @@ void TerrainApp::UpdateScene(float dt)
 	// Control the camera.
 	//
 	if (GetAsyncKeyState('W') & 0x8000)
-		m_Camera.Walk(20.0f * dt);
+		m_Camera.Walk(10.0f * dt);
 
 	if (GetAsyncKeyState('S') & 0x8000)
-		m_Camera.Walk(-20.0f * dt);
+		m_Camera.Walk(-10.0f * dt);
 
 	if (GetAsyncKeyState('A') & 0x8000)
-		m_Camera.Strafe(-20.0f * dt);
+		m_Camera.Strafe(-10.0f * dt);
 
 	if (GetAsyncKeyState('D') & 0x8000)
-		m_Camera.Strafe(20.0f * dt);
+		m_Camera.Strafe(10.0f * dt);
 
 	//
 	// Walk/fly mode
@@ -162,12 +181,26 @@ void TerrainApp::UpdateScene(float dt)
 		float y = m_Terrain.GetHeight(camPos.x, camPos.z);
 		m_Camera.SetPosition(camPos.x, y + 2, camPos.z);
 	}
+
+	//
+	// Reset particle systems.
+	//
+	if (GetAsyncKeyState('R') & 0x8000)
+	{
+		m_Fire.Reset();
+		m_Rain.Reset();
+	}
+
+	m_Fire.Update(dt, timer_.TotalTime());
+	m_Rain.Update(dt, timer_.TotalTime());
 }
 
-void TerrainApp::DrawScene()
+void ParticlesApp::DrawScene()
 {
 	d3d_context_->ClearRenderTargetView(render_target_view_, (const float*)&Colors::Silver);
 	d3d_context_->ClearDepthStencilView(depth_stencil_view_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
+
+	float blendFactor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 	m_Camera.UpdateViewMatrix();
 
@@ -184,10 +217,24 @@ void TerrainApp::DrawScene()
 	d3d_context_->RSSetState(nullptr);
 	d3d_context_->OMSetDepthStencilState(nullptr, 0);
 
+	// Draw particle systems last so it is blended with scene.
+	m_Fire.SetEyePos(m_Camera.GetPosition());
+	m_Fire.Draw(d3d_context_, m_Camera);
+	d3d_context_->OMSetBlendState(nullptr, blendFactor, 0xffffffff); // restore default
+
+	m_Rain.SetEyePos(m_Camera.GetPosition());
+	m_Rain.SetEmitPos(m_Camera.GetPosition());
+	m_Rain.Draw(d3d_context_, m_Camera);
+
+	// restore default states.
+	d3d_context_->RSSetState(nullptr);
+	d3d_context_->OMSetDepthStencilState(nullptr, 0);
+	d3d_context_->OMSetBlendState(nullptr, blendFactor, 0xffffffff);
+
 	HR(swap_chain_->Present(0, 0));
 }
 
-void TerrainApp::OnMouseDown(WPARAM btnState, int x, int y)
+void ParticlesApp::OnMouseDown(WPARAM btnState, int x, int y)
 {
 	m_LastMousePos.x = x;
 	m_LastMousePos.y = y;
@@ -195,12 +242,12 @@ void TerrainApp::OnMouseDown(WPARAM btnState, int x, int y)
 	SetCapture(main_wnd_);
 }
 
-void TerrainApp::OnMouseUp(WPARAM btnState, int x, int y)
+void ParticlesApp::OnMouseUp(WPARAM btnState, int x, int y)
 {
 	ReleaseCapture();
 }
 
-void TerrainApp::OnMouseMove(WPARAM btnState, int x, int y)
+void ParticlesApp::OnMouseMove(WPARAM btnState, int x, int y)
 {
 	if ((btnState & MK_LBUTTON) != 0)
 	{
@@ -223,7 +270,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	TerrainApp theApp(hInstance);
+	ParticlesApp theApp(hInstance);
 
 	if (!theApp.Init())
 	{

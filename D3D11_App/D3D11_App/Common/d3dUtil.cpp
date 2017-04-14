@@ -327,3 +327,55 @@ void ExtractFrustumPlanes(XMFLOAT4 planes[6], CXMMATRIX T)
 		XMStoreFloat4(&planes[i], v);
 	}
 }
+
+ID3D11ShaderResourceView* D3DHelper::CreateRandomTexture1DSRV(ID3D11Device* device)
+{
+	// 
+	// Create the random data.
+	//
+	XMFLOAT4 randomVal[1024];
+	for (int i = 0; i < 1024; ++i)
+	{
+		randomVal[i].x = MathHelper::RandF(-1, 1);
+		randomVal[i].y = MathHelper::RandF(-1, 1);
+		randomVal[i].z = MathHelper::RandF(-1, 1);
+		randomVal[i].w = MathHelper::RandF(-1, 1);
+	}
+
+	D3D11_SUBRESOURCE_DATA data;
+	data.pSysMem = randomVal;
+	data.SysMemPitch = 1024 * sizeof(XMFLOAT4);
+	data.SysMemSlicePitch = 0;
+
+	//
+	// Create the texture.
+	//
+	D3D11_TEXTURE1D_DESC texDesc;
+	texDesc.Width = 1024;
+	texDesc.MipLevels = 1;
+	texDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	texDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	texDesc.CPUAccessFlags = 0;
+	texDesc.MiscFlags = 0;
+	texDesc.ArraySize = 1;
+
+	ID3D11Texture1D* randomTex = nullptr;
+	HR(device->CreateTexture1D(&texDesc, &data, &randomTex));
+
+	//
+	// Create the resource view.
+	//
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc.Format = texDesc.Format;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
+	srvDesc.Texture1D.MipLevels = texDesc.MipLevels;
+	srvDesc.Texture1D.MostDetailedMip = 0;
+
+	ID3D11ShaderResourceView* randomTexSRV = nullptr;
+	HR(device->CreateShaderResourceView(randomTex, &srvDesc, &randomTexSRV));
+
+	ReleaseCOM(randomTex);
+
+	return randomTexSRV;
+}
