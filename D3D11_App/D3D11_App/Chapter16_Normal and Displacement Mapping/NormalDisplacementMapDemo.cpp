@@ -532,15 +532,13 @@ void NormalDisplacementMapApp::DrawScene()
 	
 	d3d_context_->RSSetState(nullptr);
 	d3d_context_->IASetInputLayout(InputLayouts::Basic32);
-	d3d_context_->IASetVertexBuffers(0, 1, &m_ShapesVB, &stride, &offset);
+	d3d_context_->IASetVertexBuffers(0, 1, &m_SkullVB, &stride, &offset);
 	d3d_context_->IASetIndexBuffer(m_SkullIB, DXGI_FORMAT_R32_UINT, 0);
+
 
 	activeSkullTech->GetDesc(&techDesc);
 	for (int p = 0; p < techDesc.Passes; ++p)
 	{
-		d3d_context_->IASetVertexBuffers(0, 1, &m_SkullVB, &stride, &offset);
-		d3d_context_->IASetIndexBuffer(m_SkullIB, DXGI_FORMAT_R32_UINT, 0);
-
 		world = XMLoadFloat4x4(&m_SkullWorld);
 		worldInvTranspose = MathHelper::InverseTranspose(world);
 		worldViewProj = world * viewProj;

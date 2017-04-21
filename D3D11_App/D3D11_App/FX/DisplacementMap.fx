@@ -22,12 +22,14 @@ cbuffer cbPerObject
     float4x4 gWorldInvTranspose;
     float4x4 gViewProj;
     float4x4 gWorldViewProj;
+    float4x4 gShadowTransform;
     float4x4 gTexTransform;
     Material gMaterial;
 };
 
 // Nonnumeric values cannot be added to a cbuffer.
 Texture2D gDiffuseMap;
+Texture2D gShadowMap;
 Texture2D gNormalMap;
 TextureCube gCubeMap;
 
@@ -37,6 +39,17 @@ SamplerState samLinear
     
     AddressU = wrap;
     AddressV = wrap;
+};
+
+SamplerComparisonState samShadow
+{
+    Filter = COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+    AddressU = BORDER;
+    AddressV = BORDER;
+    AddressW = BORDER;
+    BorderColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+    ComparisonFunc = LESS;
 };
 
 struct VertexIn
@@ -133,7 +146,8 @@ struct DomainOut
     float3 PosW : POSITION;
     float3 NormalW : NORMAL;
     float3 TangentW : TANGENT;
-    float2 Tex : TEXCOORD;
+    float2 Tex : TEXCOORD0;
+    float4 ShadowPosH : TEXCOORD1;
 };
 
 // The domain shader is called for every vertex created by the tessellator.  
@@ -168,6 +182,9 @@ DomainOut DS(PatchTess patchTess,
 
     // Offset vertex along normal.
     dout.PosW += (gHeightScale * (h - 1.0f)) * dout.NormalW;
+
+	// Generate projective tex-coords to project shadow map onto scene.
+    dout.ShadowPosH = mul(float4(dout.PosW, 1.0f), gShadowTransform);
 
     // Project to homogeneous clip space.
     dout.PosH = mul(float4(dout.PosW, 1.0f), gViewProj);
@@ -217,16 +234,20 @@ float4 PS(DomainOut pin,
         float4 diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
         float4 spec = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-    // Sum the light contribution from each light source.  
-    [unroll]
+		// Only the first light casts a shadow.
+        float3 shadow = float3(1.0f, 1.0f, 1.0f);
+        shadow[0] = CalcShadowFactor(samShadow, gShadowMap, pin.ShadowPosH);
+
+        // Sum the light contribution from each light source.  
+        [unroll]
         for (int i = 0; i < gLightCount; ++i)
         {
             float4 A, D, S;
             ComputeDirectionalLight(gMaterial, gDirLights[i], bumpedNormalW, toEye, A, D, S);
 
             ambient += A;
-            diffuse += D;
-            spec += S;
+            diffuse += shadow[i] * D;
+            spec += shadow[i] * S;
         }
 
         // Modulate with late add.

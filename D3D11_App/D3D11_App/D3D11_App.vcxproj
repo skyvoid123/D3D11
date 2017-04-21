@@ -145,12 +145,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Chapter18_Particle System\Effects.h" />
-    <ClInclude Include="Chapter18_Particle System\ParticleSystem.h" />
-    <ClInclude Include="Chapter18_Particle System\RenderStates.h" />
-    <ClInclude Include="Chapter18_Particle System\Sky.h" />
-    <ClInclude Include="Chapter18_Particle System\Terrain.h" />
-    <ClInclude Include="Chapter18_Particle System\Vertex.h" />
+    <ClInclude Include="Chapter19_Shadow\Effects.h" />
+    <ClInclude Include="Chapter19_Shadow\RenderStates.h" />
+    <ClInclude Include="Chapter19_Shadow\ShadowMap.h" />
+    <ClInclude Include="Chapter19_Shadow\Sky.h" />
+    <ClInclude Include="Chapter19_Shadow\Terrain.h" />
+    <ClInclude Include="Chapter19_Shadow\Vertex.h" />
     <ClInclude Include="Common\Camera.h" />
     <ClInclude Include="Common\DDSTextureLoader.h" />
     <ClInclude Include="Common\LightHelper.h" />
@@ -164,13 +164,13 @@
     <ClInclude Include="Common\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Chapter18_Particle System\Effects.cpp" />
-    <ClCompile Include="Chapter18_Particle System\ParticleSystem.cpp" />
-    <ClCompile Include="Chapter18_Particle System\RenderStates.cpp" />
-    <ClCompile Include="Chapter18_Particle System\Sky.cpp" />
-    <ClCompile Include="Chapter18_Particle System\Terrain.cpp" />
-    <ClCompile Include="Chapter18_Particle System\ParticlesDemo.cpp" />
-    <ClCompile Include="Chapter18_Particle System\Vertex.cpp" />
+    <ClCompile Include="Chapter19_Shadow\Effects.cpp" />
+    <ClCompile Include="Chapter19_Shadow\RenderStates.cpp" />
+    <ClCompile Include="Chapter19_Shadow\ShadowMap.cpp" />
+    <ClCompile Include="Chapter19_Shadow\ShadowsDemo.cpp" />
+    <ClCompile Include="Chapter19_Shadow\Sky.cpp" />
+    <ClCompile Include="Chapter19_Shadow\Terrain.cpp" />
+    <ClCompile Include="Chapter19_Shadow\Vertex.cpp" />
     <ClCompile Include="Common\Camera.cpp" />
     <ClCompile Include="Common\d3dUtil.cpp" />
     <ClCompile Include="Common\DDSTextureLoader.cpp" />
@@ -270,6 +270,25 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
     </CustomBuild>
     <CustomBuild Include="FX\Rain.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="FX\BuildShadowMap.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="FX\DebugTexture.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="FX\LightHelper.fx">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
