@@ -98,6 +98,8 @@ struct Box
 		XMVECTOR e = XMLoadFloat3(&extent);
 		return c + e;
 	}
+
+	bool IsIntersectTriangle(FXMVECTOR v0, CXMVECTOR v1, CXMVECTOR v2);
 };
 
 struct Ray

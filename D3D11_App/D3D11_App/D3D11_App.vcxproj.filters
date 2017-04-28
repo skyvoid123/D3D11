@@ -10,13 +10,15 @@
     <ClCompile Include="Common\GeometryGenerator.cpp" />
     <ClCompile Include="Common\MathHelper.cpp" />
     <ClCompile Include="Common\Waves.cpp" />
-    <ClCompile Include="Chapter19_Shadow\Effects.cpp" />
-    <ClCompile Include="Chapter19_Shadow\RenderStates.cpp" />
-    <ClCompile Include="Chapter19_Shadow\ShadowMap.cpp" />
-    <ClCompile Include="Chapter19_Shadow\ShadowsDemo.cpp" />
-    <ClCompile Include="Chapter19_Shadow\Sky.cpp" />
-    <ClCompile Include="Chapter19_Shadow\Terrain.cpp" />
-    <ClCompile Include="Chapter19_Shadow\Vertex.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\Effects.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\Octree.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\RenderStates.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\ShadowMap.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\Sky.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\Ssao.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\SsaoDemo.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\Terrain.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Camera.h" />
@@ -30,12 +32,14 @@
     <ClInclude Include="Common\LightHelper.h" />
     <ClInclude Include="Common\MathHelper.h" />
     <ClInclude Include="Common\Waves.h" />
-    <ClInclude Include="Chapter19_Shadow\Effects.h" />
-    <ClInclude Include="Chapter19_Shadow\RenderStates.h" />
-    <ClInclude Include="Chapter19_Shadow\ShadowMap.h" />
-    <ClInclude Include="Chapter19_Shadow\Sky.h" />
-    <ClInclude Include="Chapter19_Shadow\Terrain.h" />
-    <ClInclude Include="Chapter19_Shadow\Vertex.h" />
+    <ClInclude Include="Chapter20_Ambient Occlusion\Effects.h" />
+    <ClInclude Include="Chapter20_Ambient Occlusion\Octree.h" />
+    <ClInclude Include="Chapter20_Ambient Occlusion\RenderStates.h" />
+    <ClInclude Include="Chapter20_Ambient Occlusion\ShadowMap.h" />
+    <ClInclude Include="Chapter20_Ambient Occlusion\Sky.h" />
+    <ClInclude Include="Chapter20_Ambient Occlusion\Ssao.h" />
+    <ClInclude Include="Chapter20_Ambient Occlusion\Terrain.h" />
+    <ClInclude Include="Chapter20_Ambient Occlusion\Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="FX\color.fx" />
@@ -55,5 +59,9 @@
     <CustomBuild Include="FX\DebugTexture.fx" />
     <CustomBuild Include="FX\BuildShadowMap.fx" />
     <CustomBuild Include="FX\LightHelper.fx" />
+    <CustomBuild Include="FX\AmbientOcclusion.fx" />
+    <CustomBuild Include="FX\Ssao.fx" />
+    <CustomBuild Include="FX\SsaoBlur.fx" />
+    <CustomBuild Include="FX\SsaoNormalDepth.fx" />
   </ItemGroup>
 </Project>

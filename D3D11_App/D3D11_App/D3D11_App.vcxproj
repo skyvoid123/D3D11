@@ -145,12 +145,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Chapter19_Shadow\Effects.h" />
-    <ClInclude Include="Chapter19_Shadow\RenderStates.h" />
-    <ClInclude Include="Chapter19_Shadow\ShadowMap.h" />
-    <ClInclude Include="Chapter19_Shadow\Sky.h" />
-    <ClInclude Include="Chapter19_Shadow\Terrain.h" />
-    <ClInclude Include="Chapter19_Shadow\Vertex.h" />
+    <ClInclude Include="Chapter20_Ambient Occlusion\Effects.h" />
+    <ClInclude Include="Chapter20_Ambient Occlusion\Octree.h" />
+    <ClInclude Include="Chapter20_Ambient Occlusion\RenderStates.h" />
+    <ClInclude Include="Chapter20_Ambient Occlusion\ShadowMap.h" />
+    <ClInclude Include="Chapter20_Ambient Occlusion\Sky.h" />
+    <ClInclude Include="Chapter20_Ambient Occlusion\Ssao.h" />
+    <ClInclude Include="Chapter20_Ambient Occlusion\Terrain.h" />
+    <ClInclude Include="Chapter20_Ambient Occlusion\Vertex.h" />
     <ClInclude Include="Common\Camera.h" />
     <ClInclude Include="Common\DDSTextureLoader.h" />
     <ClInclude Include="Common\LightHelper.h" />
@@ -164,13 +166,15 @@
     <ClInclude Include="Common\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Chapter19_Shadow\Effects.cpp" />
-    <ClCompile Include="Chapter19_Shadow\RenderStates.cpp" />
-    <ClCompile Include="Chapter19_Shadow\ShadowMap.cpp" />
-    <ClCompile Include="Chapter19_Shadow\ShadowsDemo.cpp" />
-    <ClCompile Include="Chapter19_Shadow\Sky.cpp" />
-    <ClCompile Include="Chapter19_Shadow\Terrain.cpp" />
-    <ClCompile Include="Chapter19_Shadow\Vertex.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\Effects.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\Octree.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\RenderStates.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\ShadowMap.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\Sky.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\Ssao.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\SsaoDemo.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\Terrain.cpp" />
+    <ClCompile Include="Chapter20_Ambient Occlusion\Vertex.cpp" />
     <ClCompile Include="Common\Camera.cpp" />
     <ClCompile Include="Common\d3dUtil.cpp" />
     <ClCompile Include="Common\DDSTextureLoader.cpp" />
@@ -289,6 +293,30 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="FX\LightHelper.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="FX\AmbientOcclusion.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="FX\Ssao.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="FX\SsaoBlur.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="FX\SsaoNormalDepth.fx">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">fxc /Fc /Od /Zi /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).fxo</Outputs>
